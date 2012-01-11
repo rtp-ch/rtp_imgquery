@@ -1,0 +1,26 @@
+<noscript>
+    ###DEFAULT_IMAGE###
+</noscript>
+<script type="text/javascript">
+    imgQuery = window.imgQuery || {};
+    imgQuery.interrupt = function() { imgQuery.windowLoaded = true; };
+    if ( !window.addEventListener ) {
+        window.attachEvent('onload', imgQuery.interrupt);
+    } else {
+        window.addEventListener('load', imgQuery.interrupt, false);
+    }
+    if( typeof imgQuery.windowLoaded === 'undefined' || !imgQuery.windowLoaded) {
+        imgQuery.breakpoints = ###BREAKPOINTS###;
+        imgQuery.images = ###IMAGES###;
+        imgQuery.breakpoint = imgQuery.breakpoints[0];
+        imgQuery.image = imgQuery.images[imgQuery.breakpoint];
+        for (var i = 0; i < imgQuery.breakpoints.length; i++) {
+            if(imgQuery.breakpoints[i] <= window.innerWidth) {
+                document.write(imgQuery.image);
+                break;
+            }
+            imgQuery.breakpoint = imgQuery.breakpoints[i];
+            imgQuery.image = imgQuery.images[imgQuery.breakpoint];
+        }
+    }
+</script>
