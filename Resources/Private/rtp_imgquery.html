@@ -1,26 +1,36 @@
-<noscript>
-    ###DEFAULT_IMAGE###
-</noscript>
+<noscript>###DEFAULT_IMAGE###</noscript>
 <script type="text/javascript">
-    imgQuery = window.imgQuery || {};
-    imgQuery.interrupt = function() { imgQuery.windowLoaded = true; };
-    if ( !window.addEventListener ) {
-        window.attachEvent('onload', imgQuery.interrupt);
-    } else {
-        window.addEventListener('load', imgQuery.interrupt, false);
-    }
-    if( typeof imgQuery.windowLoaded === 'undefined' || !imgQuery.windowLoaded) {
-        imgQuery.breakpoints = ###BREAKPOINTS###;
-        imgQuery.images = ###IMAGES###;
-        imgQuery.breakpoint = imgQuery.breakpoints[0];
-        imgQuery.image = imgQuery.images[imgQuery.breakpoint];
-        for (var i = 0; i < imgQuery.breakpoints.length; i++) {
-            if(imgQuery.breakpoints[i] <= window.innerWidth) {
-                document.write(imgQuery.image);
-                break;
-            }
-            imgQuery.breakpoint = imgQuery.breakpoints[i];
-            imgQuery.image = imgQuery.images[imgQuery.breakpoint];
-        }
-    }
+
+// local scope
+(function(){
+
+	// initialize global object only once
+	// rtp_iQp stands for imgQueryProcessed
+	if (typeof(rtp_iQp) == 'undefined') rtp_iQp = {};
+
+	// is id not yet initialized?
+	if (!rtp_iQp[###ID###])
+	{
+
+		// declare image Query image
+		var iQi = rtp_iQp[###ID###] =
+		{
+			id : ###ID###,
+			imgs : ###IMAGES###,
+			brpts : ###BREAKPOINTS###
+		};
+
+		// search for the breakpoint we will use (default is last)
+		for (var i = 0, l = iQi.brpts.length - 1; i < l; i++)
+		{ if(iQi.brpts[i] <= window.innerWidth) break; }
+
+		// store and write out the selected image
+		document.write(iQi.img = iQi.imgs[iQi.brpts[i]]);
+
+	}
+	// EO is not yet initialized
+
+})();
+	// EO local scope
+
 </script>

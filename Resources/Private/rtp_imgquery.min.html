@@ -1,7 +1,4 @@
-<noscript>
-    ###DEFAULT_IMAGE###
-</noscript>
+<noscript>###DEFAULT_IMAGE###</noscript>
 <script type="text/javascript">
-imgQuery=window.imgQuery||{};imgQuery.interrupt=function(){imgQuery.windowLoaded=!0};window.addEventListener?window.addEventListener("load",imgQuery.interrupt,!1):window.attachEvent("onload",imgQuery.interrupt);
-if("undefined"===typeof imgQuery.windowLoaded||!imgQuery.windowLoaded){imgQuery.breakpoints=###BREAKPOINTS###;imgQuery.images=###IMAGES###;imgQuery.breakpoint=imgQuery.breakpoints[0];imgQuery.image=imgQuery.images[imgQuery.breakpoint];for(var i=0;i<imgQuery.breakpoints.length;i++){if(imgQuery.breakpoints[i]<=window.innerWidth){document.write(imgQuery.image);break}imgQuery.breakpoint=imgQuery.breakpoints[i];imgQuery.image=imgQuery.images[imgQuery.breakpoint]}};
+(function(){if(typeof(rtp_iQp)=='undefined')rtp_iQp={};if(!rtp_iQp[###ID###]){var iQi=rtp_iQp[###ID###]={id:###ID###,imgs:###IMAGES###,brpts:###BREAKPOINTS###};for(var i=0,l=iQi.brpts.length-1;i<l;i++)if(iQi.brpts[i]<=window.innerWidth)break;document.write(iQi.img=iQi.imgs[iQi.brpts[i]]);}})();
 </script>
