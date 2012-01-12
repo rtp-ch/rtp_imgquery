@@ -162,8 +162,8 @@ t3lib_utility_Debug::debugInPopUpWindow(array(
     {
         if( !isset($this->registry[$this->id]['template']) ) {
             $this->registry[$this->id]['template'] = t3lib_div::getFileAbsFileName(self::DEFAULT_TEMPLATE);
-            if(isset($this->conf['file.']['breakpoint.']['template'])) {
-                $template = t3lib_div::getFileAbsFileName($this->conf['file.']['breakpoint.']['template']);
+            if(isset($this->conf['breakpoints.']['template'])) {
+                $template = t3lib_div::getFileAbsFileName($this->conf['breakpoints.']['template']);
                 if( is_readable($template) ) {
                     $this->registry[$this->id]['template'] = $template;
                 }
@@ -204,6 +204,7 @@ t3lib_utility_Debug::debugInPopUpWindow(array(
      * Cleans the marker array by removing duplicates. For example, if certain breakpoint/image combinations
      * are identical they will be removed.
      *
+     * @return void
      */
     private function cleanMarkers()
     {
@@ -554,7 +555,7 @@ t3lib_utility_Debug::debugInPopUpWindow(array(
     private function breakpointConfigurations()
     {
         if( !isset($this->registry[$this->id]['breakpointConfigurations']) ) {
-            $this->registry[$this->id]['breakpointConfigurations'] = (array) $this->conf['breakpoints.'];
+            $this->registry[$this->id]['breakpointConfigurations'] = array_filter((array) $this->conf['breakpoints.'], 'is_numeric');
         }
         return $this->registry[$this->id]['breakpointConfigurations'];
     }
