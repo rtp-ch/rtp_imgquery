@@ -82,21 +82,17 @@ class ux_tslib_content_Image extends tslib_content_Image
         $this->id = $this->id();
 
         if ($this->cObj->checkIf($conf['if.'])) {
+/*
+t3lib_utility_Debug::debugInPopUpWindow(array(
+    'conf'              => $this->conf,
+    'hasBreakpoints'    => $this->hasBreakpoints()
+));
+*/
 
             // If breakpoints have been defined in the TypoScript configuration create
             // a responsive version of the image
             if( $this->hasBreakpoints() ) {
                 $theValue = $this->responsiveImage();
-
-            // Otherwise create the default image
-            } else {
-                $theValue = $this->defaultImage();
-            }
-
-            if (isset($conf['stdWrap.'])) {
-                $theValue = $this->cObj->stdWrap($theValue, $conf['stdWrap.']);
-            }
-
 /*
 //
 t3lib_utility_Debug::debugInPopUpWindow(array(
@@ -114,6 +110,16 @@ t3lib_utility_Debug::debugInPopUpWindow(array(
     'theValue'          => $theValue,
 ));
 */
+
+            // Otherwise create the default image
+            } else {
+                $theValue = $this->defaultImage();
+            }
+
+            if (isset($conf['stdWrap.'])) {
+                $theValue = $this->cObj->stdWrap($theValue, $conf['stdWrap.']);
+            }
+
             return $theValue;
         }
     }
@@ -493,7 +499,7 @@ t3lib_utility_Debug::debugInPopUpWindow(array(
 
     /**
      * Gets the default breakpoint either as configured in file.breakpoint or from the width
-     * of the default image (file.width, probably a bad idea...).
+     * of the default image
      *
      * @return int
      */
@@ -555,7 +561,14 @@ t3lib_utility_Debug::debugInPopUpWindow(array(
     private function breakpointConfigurations()
     {
         if( !isset($this->registry[$this->id]['breakpointConfigurations']) ) {
-            $this->registry[$this->id]['breakpointConfigurations'] = array_filter((array) $this->conf['breakpoints.'], 'is_numeric');
+            $this->registry[$this->id]['breakpointConfigurations'] = array();
+            if(is_array($this->conf['breakpoints.']) && !empty($this->conf['breakpoints.'])) {
+                foreach($this->conf['breakpoints.'] as $breakpoint => $breakpointConfiguration) {
+                    if(is_numeric(substr($breakpoint, 0, -1))) {
+                        $this->registry[$this->id]['breakpointConfigurations'][$breakpoint] = $breakpointConfiguration;
+                    }
+                }
+            }
         }
         return $this->registry[$this->id]['breakpointConfigurations'];
     }
