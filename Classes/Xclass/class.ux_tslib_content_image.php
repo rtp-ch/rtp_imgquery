@@ -44,7 +44,7 @@ class ux_tslib_content_Image extends tslib_content_Image
      *
      * @var string
      */
-    const DEFAULT_TEMPLATE              = 'EXT:rtp_imgquery/Resources/Private/rtp_imgquery.html';
+    const DEFAULT_TEMPLATE              = 'EXT:rtp_imgquery/Resources/Private/rtp_imgquery.min.html';
 
     /**
      * Initial content of responsive images templates
