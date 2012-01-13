@@ -82,34 +82,35 @@ class ux_tslib_content_Image extends tslib_content_Image
         $this->id = $this->id();
 
         if ($this->cObj->checkIf($conf['if.'])) {
-/*
-t3lib_utility_Debug::debugInPopUpWindow(array(
-    'conf'              => $this->conf,
-    'hasBreakpoints'    => $this->hasBreakpoints()
-));
-*/
+
+if($this->conf['breakpoints.']['debug']) {
+    t3lib_utility_Debug::debugInPopUpWindow(array(
+        'START'             => '========================================',
+        'conf'              => $this->conf,
+        'hasBreakpoints'    => $this->hasBreakpoints()
+    ));
+}
 
             // If breakpoints have been defined in the TypoScript configuration create
             // a responsive version of the image
             if( $this->hasBreakpoints() ) {
                 $theValue = $this->responsiveImage();
-/*
-//
-t3lib_utility_Debug::debugInPopUpWindow(array(
-    'id'                => $this->id(),
-    'info'              => $this->cObj->getImgResource($this->conf['file'], $this->conf),
-    'conf'              => $this->conf,
-    'impliedConf'       => $this->impliedConfigurations(),
-    'defaultImage'      => $this->defaultImage(),
-    'defaultWidth'      => $this->defaultWidth(),
-    'defaultBreakpoint' => $this->defaultBreakpoint(),
-    'breakpoints'       => $this->breakpoints(),
-    'images'            => $this->images(),
-    'attributes'        => $this->attributes(),
-    'markers'           => $this->getMarkers(),
-    'theValue'          => $theValue,
-));
-*/
+
+if($this->conf['breakpoints.']['debug']) {
+    t3lib_utility_Debug::debugInPopUpWindow(array(
+        'id'                => $this->id(),
+        'info'              => $this->cObj->getImgResource($this->conf['file'], $this->conf),
+        'conf'              => $this->conf,
+        'impliedConf'       => $this->impliedConfigurations(),
+        'defaultImage'      => $this->defaultImage(),
+        'defaultWidth'      => $this->defaultWidth(),
+        'defaultBreakpoint' => $this->defaultBreakpoint(),
+        'breakpoints'       => $this->breakpoints(),
+        'images'            => $this->images(),
+        'attributes'        => $this->attributes(),
+        'markers'           => $this->getMarkers()
+    ));
+}
 
             // Otherwise create the default image
             } else {
@@ -120,6 +121,12 @@ t3lib_utility_Debug::debugInPopUpWindow(array(
                 $theValue = $this->cObj->stdWrap($theValue, $conf['stdWrap.']);
             }
 
+if($this->conf['breakpoints.']['debug']) {
+    t3lib_utility_Debug::debugInPopUpWindow(array(
+        'theValue'          => $theValue,
+        'END'               => '========================================'
+    ));
+}
             return $theValue;
         }
     }
