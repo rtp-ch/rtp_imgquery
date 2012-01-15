@@ -308,14 +308,13 @@ if($this->conf['breakpoints.']['debug']) {
     }
 
     /**
-     * Image id: IMAGE objects where the exact same TypoScript configuration are identical (the
-     * id is created from the initial TypoScript configuration array).
+     * Instance id: a unique Id for each IMAGE object.
      *
      * @return null
      */
     private function id()
     {
-        return md5(serialize($this->conf));
+        return md5(uniqid(mt_rand(), true));
     }
 
     /**
