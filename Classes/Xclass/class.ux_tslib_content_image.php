@@ -310,7 +310,7 @@ if($this->conf['breakpoints.']['debug']) {
     /**
      * Instance id: a unique Id for each IMAGE object.
      *
-     * @return null
+     * @return string
      */
     private function id()
     {
@@ -551,7 +551,7 @@ if($this->conf['breakpoints.']['debug']) {
     private function breakpointConfiguration($breakpoint)
     {
         $breakpointConfigurations = $this->breakpointConfigurations();
-        if(is_array($breakpointConfigurations[$breakpoint . '.']) && !empty($breakpointConfigurations[$breakpoint . '.'])) {
+        if (is_array($breakpointConfigurations[$breakpoint . '.']) && !empty($breakpointConfigurations[$breakpoint . '.'])) {
             $breakpointConfiguration = $breakpointConfigurations[$breakpoint . '.'];
         } else {
             $breakpointConfiguration = null;
@@ -567,15 +567,34 @@ if($this->conf['breakpoints.']['debug']) {
     private function breakpointConfigurations()
     {
         if( !isset($this->registry[$this->id]['breakpointConfigurations']) ) {
-            $this->registry[$this->id]['breakpointConfigurations'] = array();
-            if(is_array($this->conf['breakpoints.']) && !empty($this->conf['breakpoints.'])) {
-                foreach($this->conf['breakpoints.'] as $breakpoint => $breakpointConfiguration) {
-                    if(is_numeric(substr($breakpoint, 0, -1))) {
-                        $this->registry[$this->id]['breakpointConfigurations'][$breakpoint] = $breakpointConfiguration;
+            $breakpointConfigurations = array();
+
+            // Breakpoint configuration as "breakpoints = x:a, y:b, z:c" where x, y & z are the breakpoints and
+            // a, b, c are the image widths.
+            if( isset($this->conf['breakpoints']) ) {
+                $breakpoints = t3lib_div::trimExplode(',', $this->conf['breakpoints'], true);
+                while($breakpoint = array_shift($breakpoints)) {
+                    $breakpointSetting = t3lib_div::trimExplode(',', $breakpoint, true, 2);
+                    if(isset($breakpointSetting[1])) {
+                        $breakpointConfigurations[$breakpoint]['file.']['width'] = $breakpointSetting[1];
                     }
                 }
             }
+
+            // Configuration "breakpoints.x.file.width = n" where x is the breakpoint and n is the
+            // corresponding image width.
+            if(is_array($this->conf['breakpoints.']) && !empty($this->conf['breakpoints.'])) {
+                foreach($this->conf['breakpoints.'] as $breakpoint => $breakpointConfiguration) {
+                    if(is_numeric(substr($breakpoint, 0, -1))) {
+                        $breakpointConfigurations[$breakpoint] =
+                            array_merge((array) $breakpointConfigurations[$breakpoint], $breakpointConfiguration);
+                    }
+                }
+            }
+
+            $this->registry[$this->id]['breakpointConfigurations'] = $breakpointConfigurations;
         }
+
         return $this->registry[$this->id]['breakpointConfigurations'];
     }
 
@@ -601,15 +620,18 @@ if($this->conf['breakpoints.']['debug']) {
 
             $breakpoints = array();
 
-            // The simplest (and most unlikely) case is that breakpoints are configured as
-            // breakpoints = x, y, z where x, y & z are the breakpoints (i.e. viewport width)
-            // and the image widths.
+            // The simplest case is that breakpoints are configured as "breakpoints = x, y, z" where
+            // x, y & z are the breakpoints and the corresponding image widths. Alternatively the breakpoints can
+            // be configure as "breakpoints = x:a, y:b, z:c" where x, y & z are the breakpoints and a, b, c
+            // are the image widths.
             if( isset($this->conf['breakpoints']) ) {
                 $breakpoints = t3lib_div::trimExplode(',', $this->conf['breakpoints'], true);
+                // Converts something like 610:400 to 610
+                $breakpoints = array_map('intval', $breakpoints);
             }
 
-            // A more detailed (and plausible) configuration is breakpoints.x.file.width = n where x
-            // is the breakpoint (i.e. viewport width) and n is the corresponding image width.
+            // A more detailed configuration is breakpoints.x.file.width = n where x is the breakpoint
+            // (i.e. viewport width) and n is the corresponding image width.
             if( $this->hasBreakpointConfigurations() ) {
                 $breakpoints = array_merge($breakpoints, (array) array_map('intval', array_keys($this->breakpointConfigurations())));
             }
