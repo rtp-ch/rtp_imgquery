@@ -29,6 +29,7 @@
  * Extends IMAGE class object for responsive images
  *
  * @author Simon Tuck <stu@rtp.ch>
+ * TODO: Little more than proof of concept, needs extensive refactoring!
  */
 class ux_tslib_content_Image extends tslib_content_Image
 {
@@ -295,19 +296,6 @@ if($this->conf['breakpoints.']['debug']) {
     }
 
     /**
-     * Gets info on the original image, e.g. dimensions, file hash, etc.
-     *
-     * @return array
-     */
-    private function imageInfo()
-    {
-        if( !isset($this->registry[$this->id]['imageInfo']) ) {
-            $this->registry[$this->id]['imageInfo'] = $this->cObj->getImgResource($this->conf['file'], $this->conf);
-        }
-        return $this->registry[$this->id]['imageInfo'];
-    }
-
-    /**
      * Instance id: a unique Id for each IMAGE object.
      *
      * @return string
@@ -426,9 +414,10 @@ if($this->conf['breakpoints.']['debug']) {
      * @param $breakpoint
      * @return string
      */
-    private function modifiedHeight($breakpoint)
+    private function modifiedHeight($width)
     {
-        $height = floor($breakpoint / intval($this->defaultWidth()) * intval($this->defaultHeight()));
+        // TODO: See modifiedWidth
+        $height = floor(intval($width) / intval($this->defaultWidth()) * intval($this->defaultHeight()));
         return preg_replace('/\d+/', $height, $this->defaultHeight());
     }
 
@@ -446,17 +435,6 @@ if($this->conf['breakpoints.']['debug']) {
     }
 
     /**
-     * Gets the height of the original image
-     *
-     * @return int
-     */
-    private function originalHeight()
-    {
-        $info = $this->imageInfo();
-        return $info[1];
-    }
-
-    /**
      * Modifies the default image width to match the given breakpoint. Takes into account special
      * settings such as "c" and "m" (i.e. cropping and scaling parameters).
      *
@@ -465,7 +443,8 @@ if($this->conf['breakpoints.']['debug']) {
      */
     private function modifiedWidth($breakpoint)
     {
-        return preg_replace('/\d+/', $breakpoint, $this->defaultWidth());
+        $breakpointWidth = floor(($breakpoint / $this->defaultBreakpoint()) * intval($this->defaultWidth()));
+        return preg_replace('/^\d+/', $breakpointWidth, $this->defaultWidth());
     }
 
     /**
@@ -479,17 +458,6 @@ if($this->conf['breakpoints.']['debug']) {
             $this->registry[$this->id]['defaultWidth'] = $this->cObj->stdWrap($this->conf['file.']['width'], $this->conf['file.']['width.']);
         }
         return $this->registry[$this->id]['defaultWidth'];
-    }
-
-    /**
-     * Gets the width of the original image
-     *
-     * @return int
-     */
-    private function originalWidth()
-    {
-        $info = $this->imageInfo();
-        return $info[0];
     }
 
     /**
@@ -660,19 +628,11 @@ if($this->conf['breakpoints.']['debug']) {
     private function removeBreakpoint($breakpoint)
     {
         $index = array_search($breakpoint, $this->registry[$this->id]['breakpoints']);
-        unset($this->registry[$this->id]['breakpoints'][$index]);
-        unset($this->registry[$this->id]['images'][$breakpoint]);
-        unset($this->registry[$this->id]['attributes'][$breakpoint]);
-    }
-
-    /**
-     * Determines if images can be scaled up. If not then certain image widths will not make sense.
-     *
-     * @return bool
-     */
-    private function hasNoScaleUp()
-    {
-        return (boolean) $GLOBALS['TYPO3_CONF_VARS']['GFX']['im_noScaleUp'];
+        if($index >= 0) {
+            unset($this->registry[$this->id]['breakpoints'][$index]);
+            unset($this->registry[$this->id]['images'][$breakpoint]);
+            unset($this->registry[$this->id]['attributes'][$breakpoint]);
+        }
     }
 }
 
