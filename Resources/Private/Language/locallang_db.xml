@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+    <meta type="array">
+        <type>database</type>
+        <description>Language labels for database tables/fields belonging to extension 'rtp_imgquery'</description>
+    </meta>
+    <data type="array">
+        <languageKey index="default" type="array">
+            <label index="tt_content.tx_rtpresponsive_breakpoint">Default Breakpoint (current image width)</label>
+            <label index="tt_content.tx_rtpresponsive_breakpoints">Breakpoints (one per line "breakpoint : image width", e.g. "1000:460")</label>
+        </languageKey>
+    </data>
+</T3locallang>

@@ -84,20 +84,20 @@ class ux_tslib_content_Image extends tslib_content_Image
 
         if ($this->cObj->checkIf($conf['if.'])) {
 
-if($this->conf['breakpoints.']['debug']) {
+//if($this->conf['breakpoints.']['debug']) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         'START'             => '========================================',
         'conf'              => $this->conf,
         'hasBreakpoints'    => $this->hasBreakpoints()
     ));
-}
+//}
 
             // If breakpoints have been defined in the TypoScript configuration create
             // a responsive version of the image
             if( $this->hasBreakpoints() ) {
                 $theValue = $this->responsiveImage();
 
-if($this->conf['breakpoints.']['debug']) {
+//if($this->conf['breakpoints.']['debug']) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         'id'                => $this->id(),
         'info'              => $this->cObj->getImgResource($this->conf['file'], $this->conf),
@@ -111,7 +111,7 @@ if($this->conf['breakpoints.']['debug']) {
         'attributes'        => $this->attributes(),
         'markers'           => $this->getMarkers()
     ));
-}
+//}
 
             // Otherwise create the default image
             } else {
@@ -480,7 +480,13 @@ if($this->conf['breakpoints.']['debug']) {
     private function defaultBreakpoint()
     {
         if( !isset($this->registry[$this->id]['defaultBreakpoint']) ) {
-            $this->registry[$this->id]['defaultBreakpoint'] =  $this->conf['file.']['breakpoint'] ? intval($this->conf['file.']['breakpoint']) : intval($this->defaultWidth());
+            if($this->conf['file.']['breakpoint']) {
+                $defaultBreakpoint = $this->cObj->stdWrap($this->conf['breakpoint'], $this->conf['breakpoint.']);
+            } else {
+                $defaultBreakpoint = intval($this->defaultWidth());
+            }
+
+            $this->registry[$this->id]['defaultBreakpoint'] = $defaultBreakpoint;
 
         }
         return $this->registry[$this->id]['defaultBreakpoint'];
@@ -593,7 +599,8 @@ if($this->conf['breakpoints.']['debug']) {
             // be configure as "breakpoints = x:a, y:b, z:c" where x, y & z are the breakpoints and a, b, c
             // are the image widths.
             if( isset($this->conf['breakpoints']) ) {
-                $breakpoints = t3lib_div::trimExplode(',', $this->conf['breakpoints'], true);
+                $breakpoints = $this->cObj->stdWrap($this->conf['breakpoints'], $this->conf['breakpoints.']);
+                $breakpoints = t3lib_div::trimExplode(',', $breakpoints, true);
                 // Converts something like 610:400 to 610
                 $breakpoints = array_map('intval', $breakpoints);
             }
