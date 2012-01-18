@@ -384,7 +384,7 @@ if($this->conf['breakpoints.']['debug']) {
 
                         // By default width and height are based on the breakpoint
                         $impliedConfigurations[$breakpoint]['file.']['width'] = $this->modifiedWidth($breakpoint);
-                        $impliedConfigurations[$breakpoint]['file.']['height'] = $this->modifiedHeight($breakpoint);
+                        $impliedConfigurations[$breakpoint]['file.']['height'] = $this->modifiedHeight($impliedConfigurations[$breakpoint]['file.']['width']);
 
                         // The default settings are overridden by individual breakpoint TypoScript configuration
                         if($this->hasBreakpointConfiguration($breakpoint)) {
