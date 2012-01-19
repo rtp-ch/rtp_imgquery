@@ -29,7 +29,7 @@
  * Extends IMAGE class object for responsive images
  *
  * @author Simon Tuck <stu@rtp.ch>
- * TODO: Little more than proof of concept, needs extensive refactoring!
+ * TODO: Needs extensive refactoring!
  */
 class ux_tslib_content_Image extends tslib_content_Image
 {
@@ -41,18 +41,25 @@ class ux_tslib_content_Image extends tslib_content_Image
     private $registry                   = null;
 
     /**
-     * Default template
+     * Default layout
      *
      * @var string
      */
-    const DEFAULT_TEMPLATE              = 'EXT:rtp_imgquery/Resources/Private/rtp_imgquery.min.html';
+    const DEFAULT_LAYOUT              = 'EXT:rtp_imgquery/Resources/Private/Templates/rtp_imgquery.min.html';
 
     /**
-     * Initial content of responsive images templates
+     * Default style for responsive images
+     *
+     * @var string
+     */
+    const DEFAULT_STYLE               = 'width: 100%; height: auto';
+
+    /**
+     * Initial content of responsive images layouts
      *
      * @var null
      */
-    private $templateContent            = null;
+    private $layoutContent            = null;
 
     /**
      * TypoScript configuration
@@ -84,56 +91,77 @@ class ux_tslib_content_Image extends tslib_content_Image
 
         if ($this->cObj->checkIf($conf['if.'])) {
 
-//if($this->conf['breakpoints.']['debug']) {
+if($this->hasDebug()) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
-        'START'             => '========================================',
-        'conf'              => $this->conf,
-        'hasBreakpoints'    => $this->hasBreakpoints()
+        '================'              => '================',
+        'conf'                          => $this->conf,
+        'hasBreakpoints'                => $this->hasBreakpoints(),
+        'tx_rtpresponsive_breakpoint'   => $this->cObj->data['tx_rtpresponsive_breakpoint'],
+        'tx_rtpresponsive_breakpoints'  => $this->cObj->data['tx_rtpresponsive_breakpoints']
     ));
-//}
+}
 
             // If breakpoints have been defined in the TypoScript configuration create
             // a responsive version of the image
             if( $this->hasBreakpoints() ) {
-                $theValue = $this->responsiveImage();
+                $imageHtml = $this->responsiveImage();
 
-//if($this->conf['breakpoints.']['debug']) {
+if($this->hasDebug()) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         'id'                => $this->id(),
-        'info'              => $this->cObj->getImgResource($this->conf['file'], $this->conf),
-        'conf'              => $this->conf,
-        'impliedConf'       => $this->impliedConfigurations(),
         'defaultImage'      => $this->defaultImage(),
         'defaultWidth'      => $this->defaultWidth(),
         'defaultBreakpoint' => $this->defaultBreakpoint(),
         'breakpoints'       => $this->breakpoints(),
+        'impliedConf'       => $this->impliedConfigurations(),
         'images'            => $this->images(),
         'attributes'        => $this->attributes(),
         'markers'           => $this->getMarkers()
     ));
-//}
+}
 
             // Otherwise create the default image
             } else {
-                $theValue = $this->defaultImage();
+                $imageHtml = $this->defaultImage();
             }
 
             if (isset($conf['stdWrap.'])) {
-                $theValue = $this->cObj->stdWrap($theValue, $conf['stdWrap.']);
+                $imageHtml = $this->cObj->stdWrap($imageHtml, $conf['stdWrap.']);
             }
 
-if($this->conf['breakpoints.']['debug']) {
+if($this->hasDebug()) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
-        'theValue'          => $theValue,
-        'END'               => '========================================'
+        'imageHtml'         => $imageHtml,
+        '================'  => '================',
     ));
 }
-            return $theValue;
+            return $imageHtml;
         }
     }
 
+    private function style()
+    {
+        if( !isset($this->registry[$this->id]['style']) ) {
+            if( isset($this->conf['breakpoints.']['style']) ) {
+                $style = $this->conf['breakpoints.']['style'];
+            } else {
+                $style = self::DEFAULT_STYLE;
+            }
+            if( substr($style, -1) !== ';' ) {
+                $style .= ';';
+            }
+            $this->registry[$this->id]['style'] = $style;
+        }
+        return $this->registry[$this->id]['style'];
+    }
+
+    private function hasDebug()
+    {
+        return (boolean) $this->conf['breakpoints.']['debug'];
+    }
+
     /**
-     * Parses and returns the responsive image template content unless all breakpoints point to the
+     * Parses and returns the responsive image layout content unless all breakpoints point to the
      * same image. In which case the default image is returned (sans responsiveness).
      *
      * @return string
@@ -147,7 +175,7 @@ if($this->conf['breakpoints.']['debug']) {
         if(count($this->breakpoints()) > 1) {
             $search     = array_keys($this->getMarkers());
             $replace    = $this->getMarkers();
-            $content    = $this->templateContent();
+            $content    = $this->layoutContent();
             return html_entity_decode(str_ireplace($search, $replace, $content));
         } else {
             return $this->defaultImage();
@@ -155,46 +183,46 @@ if($this->conf['breakpoints.']['debug']) {
     }
 
     /**
-     * Gets the initial content of the current responsive image template
+     * Gets the initial content of the current responsive image layout
      *
      * @return string
      */
-    private function templateContent()
+    private function layoutContent()
     {
-        if( !isset($this->templateContent[$this->template()]) ) {
-            $this->templateContent[$this->template()] = t3lib_div::getURL($this->template());
+        if( !isset($this->layoutContent[$this->layout()]) ) {
+            $this->layoutContent[$this->layout()] = t3lib_div::getURL($this->layout());
         }
-        return $this->templateContent[$this->template()];
+        return $this->layoutContent[$this->layout()];
     }
 
     /**
-     * Gets the responsive image template
+     * Gets the responsive image layout
      *
      * @return array
      */
-    private function template()
+    private function layout()
     {
-        if( !isset($this->registry[$this->id]['template']) ) {
-            $this->registry[$this->id]['template'] = t3lib_div::getFileAbsFileName(self::DEFAULT_TEMPLATE);
-            if(isset($this->conf['breakpoints.']['template'])) {
-                $template = t3lib_div::getFileAbsFileName($this->conf['breakpoints.']['template']);
-                if( is_readable($template) ) {
-                    $this->registry[$this->id]['template'] = $template;
+        if( !isset($this->registry[$this->id]['layout']) ) {
+            $this->registry[$this->id]['layout'] = t3lib_div::getFileAbsFileName(self::DEFAULT_LAYOUT);
+            if(isset($this->conf['breakpoints.']['layout'])) {
+                $layout = t3lib_div::getFileAbsFileName($this->conf['breakpoints.']['layout']);
+                if( is_readable($layout) ) {
+                    $this->registry[$this->id]['layout'] = $layout;
                 }
             }
         }
-        return $this->registry[$this->id]['template'];
+        return $this->registry[$this->id]['layout'];
     }
 
     /**
-     * Sets list of markers which are inserted into the responsive image template
+     * Sets list of markers which are inserted into the responsive image layout
      *
      * @return array
      */
     private function setMarkers()
     {
         $this->registry[$this->id]['markers'] = array(
-            '###DEFAULT_IMAGE###'       => $this->defaultImage(),
+            '###DEFAULT_IMAGE###'       => $this->image($this->defaultBreakpoint()),
             '###DEFAULT_WIDTH###'       => $this->defaultWidth(),
             '###DEFAULT_BREAKPOINT###'  => $this->defaultBreakpoint(),
             '###BREAKPOINTS###'         => json_encode($this->breakpoints()),
@@ -205,7 +233,7 @@ if($this->conf['breakpoints.']['debug']) {
     }
 
     /**
-     * Gets the marker array which is inserted into the responsive image template
+     * Gets the marker array which is inserted into the responsive image layout
      *
      * @return array
      */
@@ -334,8 +362,17 @@ if($this->conf['breakpoints.']['debug']) {
             if($this->hasBreakpoints()) {
                 foreach($this->breakpoints() as $breakpoint) {
                     $impliedConfiguration = $this->impliedConfiguration($breakpoint);
-                    $this->registry[$this->id]['images'][$breakpoint] = $this->cObj->cImage($impliedConfiguration['file'], $impliedConfiguration);
+                    $images[$breakpoint] = $this->cObj->cImage($impliedConfiguration['file'], $impliedConfiguration);
                 }
+
+                // Inserts image styles
+                if (preg_match('/style\s*=\s*"([^"]+)"/i', $this->registry[$this->id]['images'])) {
+                    $images = preg_replace('%style\s*=\s*"([^"]+)"%i', ' style="' . $this->style() . ' \1"', $images);
+                } else {
+                    $images = preg_replace('%(\s*/?>$)%im', ' style="' . $this->style() . '"\1', $images);
+                }
+
+                $this->registry[$this->id]['images'] = $images;
             }
         }
         return $this->registry[$this->id]['images'];
@@ -411,12 +448,11 @@ if($this->conf['breakpoints.']['debug']) {
     /**
      * Modifies the default image height based on the default width and the given breakpoint.
      *
-     * @param $breakpoint
+     * @param string $width
      * @return string
      */
     private function modifiedHeight($width)
     {
-        // TODO: See modifiedWidth
         $height = floor(intval($width) / intval($this->defaultWidth()) * intval($this->defaultHeight()));
         return preg_replace('/\d+/', $height, $this->defaultHeight());
     }
@@ -429,7 +465,16 @@ if($this->conf['breakpoints.']['debug']) {
     private function defaultHeight()
     {
         if( !isset($this->registry[$this->id]['defaultHeight']) ) {
-            $this->registry[$this->id]['defaultHeight'] = $this->cObj->stdWrap($this->conf['file.']['height'], $this->conf['file.']['height.']);
+            if( isset($this->conf['file.']['height']) ) {
+                $defaultHeight = $this->cObj->stdWrap($this->conf['file.']['height'], $this->conf['file.']['height.']);
+            } elseif(preg_match('/height\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
+                // Avoid values which are not numeric, e.g. percentages
+                if( is_numeric($match[1]) ) {
+                    $defaultHeight = $match[1];
+                }
+                // TODO: Get image dimensions from $this->defaultSource(). see view helper functionality
+            }
+            $this->registry[$this->id]['defaultHeight'] = $defaultHeight;
         }
         return $this->registry[$this->id]['defaultHeight'];
     }
@@ -455,7 +500,16 @@ if($this->conf['breakpoints.']['debug']) {
     private function defaultWidth()
     {
         if( !isset($this->registry[$this->id]['defaultWidth']) ) {
-            $this->registry[$this->id]['defaultWidth'] = $this->cObj->stdWrap($this->conf['file.']['width'], $this->conf['file.']['width.']);
+            if( isset($this->conf['file.']['width']) ) {
+                $defaultWidth = $this->cObj->stdWrap($this->conf['file.']['width'], $this->conf['file.']['width.']);
+            } elseif(preg_match('/width\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
+                // Avoid values which are not numeric, e.g. percentages
+                if( is_numeric($match[1]) ) {
+                    $defaultWidth = $match[1];
+                }
+                // TODO: Get image dimensions from $this->defaultSource(). see view helper functionality
+            }
+            $this->registry[$this->id]['defaultWidth'] = $defaultWidth;
         }
         return $this->registry[$this->id]['defaultWidth'];
     }
@@ -480,8 +534,10 @@ if($this->conf['breakpoints.']['debug']) {
     private function defaultBreakpoint()
     {
         if( !isset($this->registry[$this->id]['defaultBreakpoint']) ) {
-            if($this->conf['file.']['breakpoint']) {
-                $defaultBreakpoint = $this->cObj->stdWrap($this->conf['breakpoint'], $this->conf['breakpoint.']);
+            if( $this->conf['breakpoint.']) {
+                $defaultBreakpoint = $this->cObj->cObjGetSingle($this->conf['breakpoint'], $this->conf['breakpoint.']);
+            } elseif( $this->conf['file.']['breakpoint'] ) {
+                $defaultBreakpoint = $this->cObj->cObjGetSingle($this->conf['breakpoint'], $this->conf['breakpoint.']);
             } else {
                 $defaultBreakpoint = intval($this->defaultWidth());
             }
@@ -599,7 +655,12 @@ if($this->conf['breakpoints.']['debug']) {
             // be configure as "breakpoints = x:a, y:b, z:c" where x, y & z are the breakpoints and a, b, c
             // are the image widths.
             if( isset($this->conf['breakpoints']) ) {
-                $breakpoints = $this->cObj->stdWrap($this->conf['breakpoints'], $this->conf['breakpoints.']);
+                if( isset($this->conf['breakpoints.']) ) {
+                    $breakpoints = strip_tags($this->cObj->cObjGetSingle($this->conf['breakpoints'], $this->conf['breakpoints.']));
+                    $breakpoints = str_replace(chr(10), ',', $breakpoints);
+                } else {
+                    $breakpoints = $this->conf['breakpoints'];
+                }
                 $breakpoints = t3lib_div::trimExplode(',', $breakpoints, true);
                 // Converts something like 610:400 to 610
                 $breakpoints = array_map('intval', $breakpoints);

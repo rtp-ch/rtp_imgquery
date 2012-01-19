@@ -36,7 +36,7 @@
  * Could not get image resource for "NonExistingImage.png".
  * </output>
  *
- * TODO: Little more than proof of concept, needs extensive refactoring!
+ * TODO: Needs extensive refactoring!
  */
 class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_ImageViewHelper
 {
@@ -46,18 +46,18 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
     const IMAGE_STYLE           = 'width: 100%; height: auto;';
 
     /**
-     * Default template
+     * Default layout
      *
      * @var string
      */
-    const DEFAULT_TEMPLATE      = 'EXT:rtp_imgquery/Resources/Private/rtp_imgquery.min.html';
+    const DEFAULT_LAYOUT      = 'EXT:rtp_imgquery/Resources/Private/Templates/rtp_imgquery.min.html';
 
     /**
-     * Initial content of responsive images templates
+     * Initial content of responsive images layouts
      *
      * @var array
      */
-    private static $templateContent;
+    private static $layoutContent;
 
     /**
      * TypoScript configuration
@@ -111,12 +111,17 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
     /**
      * @var string
      */
-    private $template;
+    private $layout;
 
     /**
      * @var array
      */
     private $markers;
+
+    /**
+     * @var string
+     */
+    private $defaultSource;
 
     /**
      * @param string $src
@@ -128,46 +133,51 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      * @param null $maxHeight
      * @param null $breakpoints
      * @param null $breakpoint
-     * @param null $template
+     * @param null $layout
      * @return string
      */
     public function render($src, $width = null, $height = null, $minWidth = null, $minHeight = null, $maxWidth = null,
-                           $maxHeight = null, $breakpoints = null, $breakpoint = null, $template = null)
+                           $maxHeight = null, $breakpoints = null, $breakpoint = null, $layout = null)
     {
         $this->setConf($src, $width, $height, $minWidth, $minHeight, $maxWidth,
-                       $maxHeight, $breakpoints, $breakpoint, $template);
+                       $maxHeight, $breakpoints, $breakpoint, $layout);
 
+if( 1 === 0) {
+    t3lib_utility_Debug::debugInPopUpWindow(array(
+        '****************'  => '****************',
+        'conf'              => $this->conf,
+        'hasBreakpoints'    => $this->hasBreakpoints()
+    ));
+}
 
         if( $this->hasBreakpoints() ) {
             $this->tag->addAttribute('style', self::IMAGE_STYLE);
             $imageHtml = $this->responsiveImage();
 
-if( 0 === 1 ) {
+if( 1 === 0) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         'id'                => $this->id(),
-        'conf'              => $this->conf,
         'defaultImage'      => $this->defaultImage(),
         'defaultWidth'      => $this->defaultWidth(),
         'defaultBreakpoint' => $this->defaultBreakpoint(),
         'breakpoints'       => $this->breakpoints(),
         'images'            => $this->images(),
         'attributes'        => $this->attributes(),
-        'markers'           => $this->getMarkers(),
-        'imageHtml'         => $imageHtml
+        'markers'           => $this->getMarkers()
     ));
 }
 
         // Otherwise create the default image
         } else {
             $imageHtml = $this->defaultImage();
-
-if( 0 === 1 ) {
-    t3lib_utility_Debug::debugInPopUpWindow(array(
-        'imageHtml'         => $imageHtml,
-    ));
-}
         }
 
+if( 1 === 0) {
+    t3lib_utility_Debug::debugInPopUpWindow(array(
+        'imageHtml'         => $imageHtml,
+        '****************'  => '****************',
+    ));
+}
             return $imageHtml;
     }
 
@@ -185,7 +195,7 @@ if( 0 === 1 ) {
         if(count($this->breakpoints()) > 1) {
             $search     = array_keys($this->getMarkers());
             $replace    = $this->getMarkers();
-            $content    = $this->templateContent();
+            $content    = $this->layoutContent();
             return html_entity_decode(str_ireplace($search, $replace, $content));
         } else {
             return $this->defaultImage();
@@ -343,9 +353,12 @@ if( 0 === 1 ) {
     {
         if( is_null($this->defaultWidth) ) {
             $this->defaultWidth = false;
-            if(preg_match('/width\s*=\s*["|\']([^"]+)["|\']/ui', $this->defaultImage(), $match)) {
-                if( is_int($match[1]) ) {
+            if(preg_match('/width\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
+                // Avoid values which are not numeric, e.g. percentages
+                if( is_numeric($match[1]) ) {
                     $this->defaultWidth = $match[1];
+                } elseif($this->defaultSource()) {
+                    // TODO: Get image dimensions from image source
                 }
             }
         }
@@ -361,9 +374,12 @@ if( 0 === 1 ) {
     {
         if( is_null($this->defaultHeight) ) {
             $this->defaultHeight = false;
-            if(preg_match('/height\s*=\s*["|\']([^"]+)["|\']/ui', $this->defaultImage(), $match)) {
-                if( is_int($match[1]) ) {
+            if(preg_match('/height\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
+                // Avoid values which are not numeric, e.g. percentages
+                if( is_numeric($match[1]) ) {
                     $this->defaultHeight = $match[1];
+                } elseif($this->defaultSource()) {
+                    // TODO: Get image dimensions from image source
                 }
             }
         }
@@ -413,10 +429,10 @@ if( 0 === 1 ) {
      * @param $maxHeight
      * @param $breakpoints
      * @param $breakpoint
-     * @param $template
+     * @param $layout
      */
     private function setConf($src, $width, $height, $minWidth, $minHeight,
-                             $maxWidth, $maxHeight, $breakpoints, $breakpoint, $template)
+                             $maxWidth, $maxHeight, $breakpoints, $breakpoint, $layout)
     {
         $this->conf['src']          = $src;
         $this->conf['width']        = $width;
@@ -427,7 +443,7 @@ if( 0 === 1 ) {
         $this->conf['maxHeight']    = $maxHeight;
         $this->conf['breakpoints']  = $breakpoints;
         $this->conf['breakpoint']   = intval($breakpoint) > 0 ? intval($breakpoint) : false;
-        $this->conf['template']     = $template;
+        $this->conf['layout']       = $layout;
     }
 
     /*
@@ -455,6 +471,20 @@ if( 0 === 1 ) {
             );
         }
         return $this->defaultImage;
+    }
+
+    public function defaultSource()
+    {
+        if( is_null($this->defaultSource) ) {
+            $this->defaultSource = false;
+            if(preg_match('/src\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
+                $defaultSource = t3lib_div::getFileAbsFileName($match[1]);
+                if(is_readable($defaultSource)) {
+                    $this->defaultSource = $defaultSource;
+                }
+            }
+        }
+        return $this->defaultSource;
     }
 
     /**
@@ -558,39 +588,39 @@ if( 0 === 1 ) {
      */
 
     /**
-     * Gets the initial content of the current responsive image template
+     * Gets the initial content of the current responsive image layout
      *
      * @return string
      */
-    private function templateContent()
+    private function layoutContent()
     {
-        if( is_null(self::$templateContent[$this->template()]) ) {
-            self::$templateContent[$this->template()] = t3lib_div::getURL($this->template());
+        if( is_null(self::$layoutContent[$this->layout()]) ) {
+            self::$layoutContent[$this->layout()] = t3lib_div::getURL($this->layout());
         }
-        return self::$templateContent[$this->template()];
+        return self::$layoutContent[$this->layout()];
     }
 
     /**
-     * Gets the responsive image template
+     * Gets the responsive image layout
      *
      * @return array
      */
-    private function template()
+    private function layout()
     {
-        if( is_null($this->template) ) {
-            $this->template = t3lib_div::getFileAbsFileName(self::DEFAULT_TEMPLATE);
-            if( isset($this->conf['template']) ) {
-                $template = $this->conf['template'];
-                if( is_readable($template) ) {
-                    $this->template = $template;
+        if( is_null($this->layout) ) {
+            $this->layout = t3lib_div::getFileAbsFileName(self::DEFAULT_LAYOUT);
+            if( isset($this->conf['layout']) ) {
+                $layout = $this->conf['layout'];
+                if( is_readable($layout) ) {
+                    $this->layout = $layout;
                 }
             }
         }
-        return $this->template;
+        return $this->layout;
     }
 
     /**
-     * Sets list of markers which are inserted into the responsive image template
+     * Sets list of markers which are inserted into the responsive image layout
      *
      * @return array
      */
@@ -608,7 +638,7 @@ if( 0 === 1 ) {
     }
 
     /**
-     * Gets the marker array which is inserted into the responsive image template
+     * Gets the marker array which is inserted into the responsive image layout
      *
      * @return array
      */

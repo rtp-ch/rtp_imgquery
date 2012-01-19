@@ -1,1 +1,6 @@
-# Nothing here...
+
+styles.content.breakpoints.default = 2000
+styles.content.breakpoints.layout = EXT:rtp_imgquery/Resources/Private/rtp_imgquery.min.html
+styles.content.breakpoints.style = width: 100%; height: auto;
+styles.content.breakpoints.debug = 0
+styles.content.breakpoints = 1200:800, 800:600, 400:300, 320:150
