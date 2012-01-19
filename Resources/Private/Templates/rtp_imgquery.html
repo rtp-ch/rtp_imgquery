@@ -4,33 +4,38 @@
 // local scope
 (function(){
 
-	// initialize global object only once
-	// rtp_iQp stands for imgQueryProcessed
-	if (typeof(rtp_iQp) == 'undefined') rtp_iQp = {};
+    // initialize global object only once
+    // rtp_iQp stands for imgQueryProcessed
+    if (typeof(rtp_iQp) == 'undefined') rtp_iQp = {};
 
-	// is id not yet initialized?
-	if (!rtp_iQp[###ID###])
-	{
+    // Only proceeds if the current image has not already been rendered.
+    if (!rtp_iQp['###ID###'])
+    {
 
-		// declare image Query image
-		var iQi = rtp_iQp[###ID###] =
-		{
-			id : ###ID###,
-			imgs : ###IMAGES###,
-			brpts : ###BREAKPOINTS###
-		};
+        // Unique image id, images per breakpoint and breakpoints
+        var iQi = rtp_iQp['###ID###'] =
+        {
+            id : '###ID###',
+            imgs : '###IMAGES###',
+            brpts : '###BREAKPOINTS###'
+        };
 
-		// search for the breakpoint we will use (default is last)
-		for (var i = 0, l = iQi.brpts.length - 1; i < l; i++)
-		{ if(iQi.brpts[i] <= window.innerWidth) break; }
+        // Identifies the first breakpoint which is less than the current window width.
+        for (var i = 0, l = iQi.brpts.length; i < l; i += 1) {
+            if(iQi.brpts[i] < window.innerWidth) {
+                break;
+            }
+        }
 
-		// store and write out the selected image
-		document.write(iQi.img = iQi.imgs[iQi.brpts[i]]);
+        // The "correct" breakpoint is the last breakpoint to exceed window width. i.e. the breakpoint
+        // from the previous for-loop-iteration (unless there was no iteration, i.e. i = 0).
+        if (i > 0) {
+            i -= 1;
+        }
 
-	}
-	// EO is not yet initialized
-
+        // store and write out the selected image
+        document.write(iQi.img = iQi.imgs[iQi.brpts[i]]);
+    }
 })();
-	// EO local scope
 
 </script>

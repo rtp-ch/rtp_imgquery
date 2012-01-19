@@ -1,4 +1,4 @@
 <noscript>###DEFAULT_IMAGE###</noscript>
 <script type="text/javascript">
-(function(){if(typeof(rtp_iQp)=='undefined')rtp_iQp={};if(!rtp_iQp[###ID###]){var iQi=rtp_iQp[###ID###]={id:###ID###,imgs:###IMAGES###,brpts:###BREAKPOINTS###};for(var i=0,l=iQi.brpts.length-1;i<l;i++)if(iQi.brpts[i]<=window.innerWidth)break;document.write(iQi.img=iQi.imgs[iQi.brpts[i]]);}})();
+(function(){"undefined"==typeof rtp_iQp&&(rtp_iQp={});if(!rtp_iQp[###ID###]){for(var b=rtp_iQp[###ID###]={id:###ID###,imgs:###IMAGES###,brpts:###BREAKPOINTS###},a=0,c=b.brpts.length;a<c&&!(b.brpts[a]<window.innerWidth);a+=1);0<a&&(a-=1);document.write(b.img=b.imgs[b.brpts[a]])}})();
 </script>
