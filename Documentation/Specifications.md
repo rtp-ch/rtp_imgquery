@@ -1,10 +1,11 @@
 #Specifications for Responsive Images (rtp_imgquery)
 
-##TYPO3 Application
+##Requirements
 
 * Breakpoint settings for IMAGE objects can be defined in TypoScript
 * A corresponding Fluid View Helper (fluid)
-* A corresponding smarty plugin (smarty
+* A corresponding smarty plugin (smarty)
+* 
 
 ###TypoScript
 Responsive image properties of an IMAGE content object can be defined individually (i.e. per breakpoint):
