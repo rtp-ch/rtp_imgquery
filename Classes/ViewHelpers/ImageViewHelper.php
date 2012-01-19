@@ -3,8 +3,7 @@
 /**
  * =============================================================================
  * 
- * Modified Version of fluid:image which allows to specify height and with of the image
- * tag separate
+ * Modified Version of fluid:image which allows specification of breakpoints
  * 
  * =============================================================================
  * 
@@ -16,9 +15,9 @@
  * <f:image src="EXT:myext/Resources/Public/typo3_logo.png" alt="alt text" />
  * </code>
  * <output>
- * <img alt="alt text" src="typo3conf/ext/myext/Resources/Public/typo3_logo.png" width="396" height="375" tagWidth="100%" tagSize="1"/>
+ * <img alt="alt text" src="typo3conf/ext/myext/Resources/Public/typo3_logo.png" width="396" height="375" breakpoint="900" breakpoints="600:300, 400"/>
  * or (in BE mode):
- * <img alt="alt text" src="../typo3conf/ext/viewhelpertest/Resources/Public/typo3_logo.png" width="100%" />
+ * <img alt="alt text" src="../typo3conf/ext/viewhelpertest/Resources/Public/typo3_logo.png"  breakpoint="900" breakpoints="600:300, 400" />
  * </output>
  *
  * <code title="Inline notation">

@@ -5,13 +5,13 @@
     t3lib_extMgm::addStaticFile($_EXTKEY, 'Configuration/TypoScript/', 'Responsive Images');
 
     // Language labels
-    $breakpointLangLabel = 'LLL:EXT:rtp_imgquery/Resources/Private/Language/locallang_db.xml:tt_content.tx_rtpresponsive_breakpoint';
-    $breakpointLangLabels = 'LLL:EXT:rtp_imgquery/Resources/Private/Language/locallang_db.xml:tt_content.tx_rtpresponsive_breakpoints';
+    $breakpointLangLabel = 'LLL:EXT:rtp_imgquery/Resources/Private/Language/locallang_db.xml:tt_content.tx_rtpimgquery_breakpoint';
+    $breakpointLangLabels = 'LLL:EXT:rtp_imgquery/Resources/Private/Language/locallang_db.xml:tt_content.tx_rtpimgquery_breakpoints';
     $paletteLangLabels = 'LLL:EXT:rtp_imgquery/Resources/Private/Language/locallang_db.xml:palette.breakpoints';
 
     // TCA Columns
     $tempColumns = array (
-        'tx_rtpresponsive_breakpoint' => array (
+        'tx_rtpimgquery_breakpoint' => array (
             'exclude' => 1,
             'label' => $breakpointLangLabel,
             'config' => array (
@@ -20,7 +20,7 @@
                 'eval' => 'int',
             )
         ),
-        'tx_rtpresponsive_breakpoints' => array (
+        'tx_rtpimgquery_breakpoints' => array (
             'exclude' => 1,
             'label' => $breakpointLangLabels,
             'config' => array (
@@ -34,7 +34,7 @@
     t3lib_extMgm::addTCAcolumns('tt_content', $tempColumns, 1);
 
     // Creates a new palette "breakpoints"
-    $paletteFields  = 'tx_rtpresponsive_breakpoint;' . $breakpointLangLabel . ', --linebreak--, tx_rtpresponsive_breakpoints;' . $breakpointLangLabels . '';
+    $paletteFields  = 'tx_rtpimgquery_breakpoint;' . $breakpointLangLabel . ', --linebreak--, tx_rtpimgquery_breakpoints;' . $breakpointLangLabels . '';
     t3lib_extMgm::addFieldsToPalette('tt_content', 'breakpoints', $paletteFields);
 
     // But can't seem to insert it after the palette image_accessibility...?

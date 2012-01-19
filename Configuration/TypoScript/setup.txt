@@ -8,14 +8,14 @@ tt_content.image.20.1 {
     breakpoint {
         value = {$styles.content.breakpoints.default}
         override.cObject = TEXT
-        override.cObject.field = tx_rtpresponsive_breakpoint
+        override.cObject.field = tx_rtpimgquery_breakpoint
     }
 
     breakpoints = TEXT
     breakpoints {
         value = {$styles.content.breakpoints}
         override.cObject = TEXT
-        override.cObject.field = tx_rtpresponsive_breakpoints
+        override.cObject.field = tx_rtpimgquery_breakpoints
     }
 
     breakpoints.layout = {$styles.content.breakpoints.layout}

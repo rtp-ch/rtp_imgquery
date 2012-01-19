@@ -96,8 +96,8 @@ if($this->hasDebug()) {
         '================'              => '================',
         'conf'                          => $this->conf,
         'hasBreakpoints'                => $this->hasBreakpoints(),
-        'tx_rtpresponsive_breakpoint'   => $this->cObj->data['tx_rtpresponsive_breakpoint'],
-        'tx_rtpresponsive_breakpoints'  => $this->cObj->data['tx_rtpresponsive_breakpoints']
+        'tx_rtpimgquery_breakpoint'   => $this->cObj->data['tx_rtpimgquery_breakpoint'],
+        'tx_rtpimgquery_breakpoints'  => $this->cObj->data['tx_rtpimgquery_breakpoints']
     ));
 }
 
