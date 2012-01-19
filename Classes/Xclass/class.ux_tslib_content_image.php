@@ -96,8 +96,8 @@ if($this->hasDebug()) {
         '================'              => '================',
         'conf'                          => $this->conf,
         'hasBreakpoints'                => $this->hasBreakpoints(),
-        'tx_rtpimgquery_breakpoint'   => $this->cObj->data['tx_rtpimgquery_breakpoint'],
-        'tx_rtpimgquery_breakpoints'  => $this->cObj->data['tx_rtpimgquery_breakpoints']
+        'tx_rtpimgquery_breakpoint'     => $this->cObj->data['tx_rtpimgquery_breakpoint'],
+        'tx_rtpimgquery_breakpoints'    => $this->cObj->data['tx_rtpimgquery_breakpoints']
     ));
 }
 
@@ -111,8 +111,8 @@ if($this->hasDebug()) {
         'id'                => $this->id(),
         'defaultImage'      => $this->defaultImage(),
         'defaultWidth'      => $this->defaultWidth(),
-        'defaultBreakpoint' => $this->defaultBreakpoint(),
         'breakpoints'       => $this->breakpoints(),
+        'defaultBreakpoint' => $this->defaultBreakpoint(),
         'impliedConf'       => $this->impliedConfigurations(),
         'images'            => $this->images(),
         'attributes'        => $this->attributes(),
@@ -362,17 +362,15 @@ if($this->hasDebug()) {
             if($this->hasBreakpoints()) {
                 foreach($this->breakpoints() as $breakpoint) {
                     $impliedConfiguration = $this->impliedConfiguration($breakpoint);
-                    $images[$breakpoint] = $this->cObj->cImage($impliedConfiguration['file'], $impliedConfiguration);
+                    $image = $this->cObj->cImage($impliedConfiguration['file'], $impliedConfiguration);
+                    // Inserts image styles
+                    if (preg_match('/style\s*=\s*"([^"]+)"/i', $image)) {
+                        $image = preg_replace('%style\s*=\s*"([^"]+)"%i', ' style="' . $this->style() . ' \1"', $image);
+                    } else {
+                        $image = preg_replace('%(\s*/?>$)%im', ' style="' . $this->style() . '"\1', $image);
+                    }
+                    $this->registry[$this->id]['images'][$breakpoint] = $image;
                 }
-
-                // Inserts image styles
-                if (preg_match('/style\s*=\s*"([^"]+)"/i', $this->registry[$this->id]['images'])) {
-                    $images = preg_replace('%style\s*=\s*"([^"]+)"%i', ' style="' . $this->style() . ' \1"', $images);
-                } else {
-                    $images = preg_replace('%(\s*/?>$)%im', ' style="' . $this->style() . '"\1', $images);
-                }
-
-                $this->registry[$this->id]['images'] = $images;
             }
         }
         return $this->registry[$this->id]['images'];
@@ -406,6 +404,7 @@ if($this->hasDebug()) {
         // Creates the TypoScript configuration for each breakpoint image from the TypoScript configuration
         // of the default image and any breakpoint TypoScript configuration.
         if( !isset($this->registry[$this->id]['impliedConfigurations']) ) {
+
             $this->registry[$this->id]['impliedConfigurations'] = array();
 
             if($this->hasBreakpoints()) {
@@ -662,8 +661,9 @@ if($this->hasDebug()) {
                     $breakpoints = $this->conf['breakpoints'];
                 }
                 $breakpoints = t3lib_div::trimExplode(',', $breakpoints, true);
+
                 // Converts something like 610:400 to 610
-                $breakpoints = array_map('intval', $breakpoints);
+                $breakpoints = array_filter(array_map('intval', $breakpoints));
             }
 
             // A more detailed configuration is breakpoints.x.file.width = n where x is the breakpoint

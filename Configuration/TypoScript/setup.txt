@@ -4,6 +4,7 @@
 # (also used for rendering 'textpic' type):
 
 tt_content.image.20.1 {
+
     breakpoint = TEXT
     breakpoint {
         value = {$styles.content.breakpoints.default}
