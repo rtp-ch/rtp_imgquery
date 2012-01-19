@@ -535,12 +535,17 @@ if($this->hasDebug()) {
         if( !isset($this->registry[$this->id]['defaultBreakpoint']) ) {
             if( $this->conf['breakpoint.']) {
                 $defaultBreakpoint = $this->cObj->cObjGetSingle($this->conf['breakpoint'], $this->conf['breakpoint.']);
-            } elseif( $this->conf['file.']['breakpoint'] ) {
-                $defaultBreakpoint = $this->cObj->cObjGetSingle($this->conf['breakpoint'], $this->conf['breakpoint.']);
+                $defaultBreakpoint = intval(strip_tags($defaultBreakpoint));
+                $defaultBreakpoint = $defaultBreakpoint > 0 ? $defaultBreakpoint : false;
+            }
+
+            if( !$defaultBreakpoint && intval($this->conf['breakpoint']) > 0 ) {
+                $defaultBreakpoint = intval($this->conf['breakpoint']);
             } else {
                 $defaultBreakpoint = intval($this->defaultWidth());
             }
 
+            $defaultBreakpoint = $defaultBreakpoint > 0 ? $defaultBreakpoint : false;
             $this->registry[$this->id]['defaultBreakpoint'] = $defaultBreakpoint;
 
         }
