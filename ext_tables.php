@@ -37,8 +37,9 @@
     $paletteFields  = 'tx_rtpimgquery_breakpoint;' . $breakpointLangLabel . ', --linebreak--, tx_rtpimgquery_breakpoints;' . $breakpointLangLabels . '';
     t3lib_extMgm::addFieldsToPalette('tt_content', 'breakpoints', $paletteFields);
 
-    // But can't seem to insert it after the palette image_accessibility...?
+    // TODO: Insert the new palette after the palette image_accessibility
     $insertFields   = '--palette--;' . $paletteLangLabels . ';breakpoints';
     $insertTypes    = 'image,textpic';
+    // This doesn't seem to work...
     $insertPosition = 'after:palette.image_accessibility;image_accessibility,';
     t3lib_extMgm::addToAllTCAtypes('tt_content', $insertFields, $insertTypes, $insertPosition);
