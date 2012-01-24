@@ -150,6 +150,7 @@ if( 1 === 0 ) {
 }
 
         if( $this->hasBreakpoints() ) {
+            // TODO: An option to define/override the style
             $this->tag->addAttribute('style', self::IMAGE_STYLE);
             $imageHtml = $this->responsiveImage();
 

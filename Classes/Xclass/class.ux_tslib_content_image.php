@@ -176,6 +176,7 @@ if($this->hasDebug()) {
      * Gets the style attached to responsive images (the image dimensions should be fluid
      * until it hits the next breakpoint).
      *
+     * TODO: Should also be possible to unset style, i.e. to not apply the default style
      * @return string
      */
     private function style()
