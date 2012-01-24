@@ -90,7 +90,7 @@ class ux_tslib_content_Image extends tslib_content_Image
         $this->conf = $conf;
         $this->id = $this->id();
 
-        if ($this->cObj->checkIf($conf['if.'])) {
+        if( $this->cObj->checkIf($conf['if.']) ) {
 
 if($this->hasDebug()) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
@@ -126,7 +126,7 @@ if($this->hasDebug()) {
                 $imageHtml = $this->defaultImage();
             }
 
-            if (isset($conf['stdWrap.'])) {
+            if( isset($conf['stdWrap.']) ) {
                 $imageHtml = $this->cObj->stdWrap($imageHtml, $conf['stdWrap.']);
             }
 
@@ -356,10 +356,10 @@ if($this->hasDebug()) {
                     // Copies default image TypoScript to each breakpoint (except for the default breakpoint), adjusts
                     // width and height of the breakpoint image version accordingly and applies any breakpoint specific
                     // TypoScript configuration (e.g. breakpoints.x.file.width = n).
-                    if($breakpoint !== $this->defaultBreakpoint()) {
+                    if( $breakpoint !== $this->defaultBreakpoint() ) {
 
                         // The default settings are overridden by individual breakpoint TypoScript configurations
-                        if($this->hasBreakpointConfiguration($breakpoint)) {
+                        if( $this->hasBreakpointConfiguration($breakpoint) ) {
                             $impliedConfigurations[$breakpoint] =
                                     t3lib_div::array_merge_recursive_overrule($impliedConfigurations[$breakpoint], $this->breakpointConfiguration($breakpoint));
                         }
@@ -525,19 +525,24 @@ if($this->hasDebug()) {
 
                 if( $breakpoint !== $this->defaultBreakpoint() ) {
 
+
+                    // Regex matches settings like 800:500 where 500 would be a configured image width
+                    // for the breakpoint 800
                     if($settings && preg_match('/' . $breakpoint . ':(\w+)/i', $settings, $width)) {
                         $breakpointConfigurations[$breakpoint]['file.']['width'] = $width[1];
-                        $breakpointConfigurations[$breakpoint]['file.']['height'] =  $this->modifiedHeight($width[1]);
+                        // TODO: Height adjustements
+                        //$breakpointConfigurations[$breakpoint]['file.']['height'] =  $this->modifiedHeight($width[1]);
                     } else {
                         $width = $this->modifiedWidth($breakpoint);
                         $breakpointConfigurations[$breakpoint]['file.']['width'] = $width;
-                        $breakpointConfigurations[$breakpoint]['file.']['height'] =  $this->modifiedHeight($width);
+                        // TODO: Height adjustements
+                        //$breakpointConfigurations[$breakpoint]['file.']['height'] =  $this->modifiedHeight($width);
                     }
 
                     if( isset($this->conf['breakpoints.'][$breakpoint . '.']) ) {
                         $breakpointConfigurations[$breakpoint]['file.'] =
                             t3lib_div::array_merge_recursive_overrule((array) $breakpointConfigurations[$breakpoint]['file.'],
-                                                                      (array) $this->conf['breakpoints.'][$breakpoint . '.']);
+                                                                      (array) $this->conf['breakpoints.'][$breakpoint . '.']['file.']);
                     }
 
                 } else {
