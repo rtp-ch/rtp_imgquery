@@ -533,7 +533,7 @@ if($this->hasDebug()) {
     private function defaultBreakpoint()
     {
         if( !isset($this->registry[$this->id]['defaultBreakpoint']) ) {
-            if( $this->conf['breakpoint.']) {
+            if( $this->conf['breakpoint.'] ) {
                 $defaultBreakpoint = $this->cObj->cObjGetSingle($this->conf['breakpoint'], $this->conf['breakpoint.']);
                 $defaultBreakpoint = intval(strip_tags($defaultBreakpoint));
                 $defaultBreakpoint = $defaultBreakpoint > 0 ? $defaultBreakpoint : false;
