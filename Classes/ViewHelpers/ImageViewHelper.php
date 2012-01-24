@@ -35,7 +35,7 @@
  * Could not get image resource for "NonExistingImage.png".
  * </output>
  *
- * TODO: Needs extensive refactoring!
+* TODO: Refactor & merge functionality of IMAGE xclass
  */
 class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_ImageViewHelper
 {
@@ -530,11 +530,6 @@ if( 1 === 0) {
 
         return $this->images;
     }
-
-
-    /**
-     *
-     **/
 
     /*
      * ========================================================
