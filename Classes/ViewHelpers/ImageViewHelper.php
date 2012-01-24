@@ -141,7 +141,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $this->setConf($src, $width, $height, $minWidth, $minHeight, $maxWidth,
                        $maxHeight, $breakpoints, $breakpoint, $layout);
 
-if( 1 === 0) {
+if( 1 === 0 ) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         '****************'  => '****************',
         'conf'              => $this->conf,
@@ -153,7 +153,7 @@ if( 1 === 0) {
             $this->tag->addAttribute('style', self::IMAGE_STYLE);
             $imageHtml = $this->responsiveImage();
 
-if( 1 === 0) {
+if( 1 === 0 ) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         'id'                => $this->id(),
         'defaultImage'      => $this->defaultImage(),
@@ -171,7 +171,7 @@ if( 1 === 0) {
             $imageHtml = $this->defaultImage();
         }
 
-if( 1 === 0) {
+if( 1 === 0 ) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         'imageHtml'         => $imageHtml,
         '****************'  => '****************',
@@ -186,19 +186,20 @@ if( 1 === 0) {
      * ========================================================
      */
 
+    /**
+     * @return mixed|string
+     */
     private function responsiveImage()
     {
-        $this->setMarkers();
-        $this->cleanMarkers();
-
         if(count($this->breakpoints()) > 1) {
-            $search     = array_keys($this->getMarkers());
-            $replace    = $this->getMarkers();
+            $search     = array_keys($this->markers());
+            $replace    = $this->markers();
             $content    = $this->layoutContent();
-            return html_entity_decode(str_ireplace($search, $replace, $content));
+            $responsiveImage = html_entity_decode(str_ireplace($search, $replace, $content));
         } else {
-            return $this->defaultImage();
+            $responsiveImage = $this->defaultImage();
         }
+        return $responsiveImage;
     }
 
     /*
@@ -316,25 +317,6 @@ if( 1 === 0) {
         }
 
         return $this->breakpointConfigurations;
-    }
-
-    /**
-     * Removes a breakpoint from the responsive image
-     *
-     * @param $breakpoint
-     */
-    private function removeBreakpoint($breakpoint)
-    {
-        $index = array_search($breakpoint, $this->breakpoints);
-        if($index >= 0) {
-            unset($this->breakpoints[$index]);
-            if($this->images[$breakpoint]) {
-                unset($this->images[$breakpoint]);
-            }
-            if(isset($this->attributes[$breakpoint])) {
-                unset($this->attributes[$breakpoint]);
-            }
-        }
     }
 
     /*
@@ -472,7 +454,12 @@ if( 1 === 0) {
         return $this->defaultImage;
     }
 
-    public function defaultSource()
+    /**
+     * TODO: Use this to determine default image dimensions when otherwise unavailable
+     *
+     * @return string
+     */
+    private function defaultSource()
     {
         if( is_null($this->defaultSource) ) {
             $this->defaultSource = false;
@@ -553,7 +540,6 @@ if( 1 === 0) {
             $attribute = null;
         }
         return $attribute;
-
     }
 
     /**
@@ -618,43 +604,19 @@ if( 1 === 0) {
      *
      * @return array
      */
-    private function setMarkers()
+    private function markers()
     {
-        $this->markers = array(
-            '###DEFAULT_IMAGE###'       => $this->defaultImage(),
-            '###DEFAULT_WIDTH###'       => $this->defaultWidth(),
-            '###DEFAULT_BREAKPOINT###'  => $this->defaultBreakpoint(),
-            '###BREAKPOINTS###'         => json_encode($this->breakpoints()),
-            '###IMAGES###'              => json_encode($this->images()),
-            '###ATTRIBUTES###'          => json_encode($this->attributes()),
-            '###ID###'                  => json_encode($this->id())
-        );
-    }
-
-    /**
-     * Gets the marker array which is inserted into the responsive image layout
-     *
-     * @return array
-     */
-    private function getMarkers()
-    {
-        return $this->markers;
-    }
-
-    /**
-     * Cleans the marker array by removing duplicates. For example, if certain breakpoint/image combinations
-     * are identical they will be removed.
-     *
-     * @return void
-     */
-    private function cleanMarkers()
-    {
-        $hasDuplicates = array_keys(array_diff_key($this->images(), array_unique($this->images())));
-        if(!empty($hasDuplicates)) {
-            foreach($hasDuplicates as $duplicate) {
-                $this->removeBreakpoint($duplicate);
-            }
-            $this->setMarkers();
+        if( is_null($this->markers) ) {
+            $this->markers = array(
+                '###DEFAULT_IMAGE###'       => $this->defaultImage(),
+                '###DEFAULT_WIDTH###'       => $this->defaultWidth(),
+                '###DEFAULT_BREAKPOINT###'  => $this->defaultBreakpoint(),
+                '###BREAKPOINTS###'         => json_encode($this->breakpoints()),
+                '###IMAGES###'              => json_encode($this->images()),
+                '###ATTRIBUTES###'          => json_encode($this->attributes()),
+                '###ID###'                  => json_encode($this->id())
+            );
         }
+        return $this->markers;
     }
 }
