@@ -1,41 +1,28 @@
 <?php
 
+/* ============================================================================
+ *
+ * This script is part of the rtp_imgquery extension ("responsive
+ * images for TYPO3") for the TYPO3 project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * ============================================================================
+ */
+
 /**
- * =============================================================================
- * 
- * Modified Version of fluid:image which allows specification of breakpoints
- * 
- * =============================================================================
- * 
- * Resizes a given image (if required) and renders the respective img tag
+ * Extends the default Fluid image view helper to accommodate responsive and
+ * fluid image techniques.
  *
- * = Examples =
+ * Example:
+ * <img alt="alt text" src="my_image.png" width="520" height="375" breakpoint="900" breakpoints="600:300, 400"/>
  *
- * <code title="Default">
- * <f:image src="EXT:myext/Resources/Public/typo3_logo.png" alt="alt text" />
- * </code>
- * <output>
- * <img alt="alt text" src="typo3conf/ext/myext/Resources/Public/typo3_logo.png" width="396" height="375" breakpoint="900" breakpoints="600:300, 400"/>
- * or (in BE mode):
- * <img alt="alt text" src="../typo3conf/ext/viewhelpertest/Resources/Public/typo3_logo.png"  breakpoint="900" breakpoints="600:300, 400" />
- * </output>
  *
- * <code title="Inline notation">
- * {f:image(src: 'EXT:viewhelpertest/Resources/Public/typo3_logo.png', alt: 'alt text', minWidth: 30, maxWidth: 40)}
- * </code>
- * <output>
- * <img alt="alt text" src="../typo3temp/pics/f13d79a526.png" width="40" height="38" />
- * (depending on your TYPO3s encryption key)
- * </output>
- *
- * <code title="non existing image">
- * <f:image src="NonExistingImage.png" alt="foo" />
- * </code>
- * <output>
- * Could not get image resource for "NonExistingImage.png".
- * </output>
- *
-* TODO: Refactor & merge functionality of IMAGE xclass
+ * @author  Simon Tuck <stu@rtp.ch>
+ * @link https://github.com/rtp-ch/rtp_imgquery
+ * @todo: Refactor & merge with IMAGE xclass methods.
  */
 class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_ImageViewHelper
 {

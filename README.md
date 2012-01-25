@@ -8,13 +8,13 @@
 * Executes as quickly as possible (does not have to wait for the DOM ready event).
 * Works without javascript (graceful degradation).
 
-###Planned Features
+###Features
 * Breakpoint options for TypoScript IMAGE objects.
 * Fluid View Helper.
 * Smarty plugin.
 * Breakpoint options for the standard image content objects ("Text & Images", "Images Only")
 
-###Further Reading
+###Recommended Reading
 * [Responsive IMGs, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs-part-2/)
 * [Google spreadsheet reviewing different solutions](https://docs.google.com/spreadsheet/ccc?key=0AisdYBkuKzZ9dHpzSmd6ZTdhbDdoN21YZ29WRVdlckE&hl=en_US#gid=0)
 

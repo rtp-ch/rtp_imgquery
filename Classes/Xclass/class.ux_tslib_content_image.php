@@ -1,36 +1,48 @@
 <?php
-/***************************************************************
- *  Copyright notice
+
+/* ============================================================================
  *
- *  (c) 2011 Simon Tuck <stu@rtp.ch>
- *  All rights reserved
+ * This script is part of the rtp_imgquery extension ("responsive
+ * images for TYPO3") for the TYPO3 project.
  *
- *  This script is part of the TYPO3 project. The TYPO3 project is
- *  free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *  The GNU General Public License can be found at
- *  http://www.gnu.org/copyleft/gpl.html.
- *  A copy is found in the textfile GPL.txt and important notices to the license
- *  from the author is found in LICENSE.txt distributed with these scripts.
- *
- *
- *  This script is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  This copyright notice MUST APPEAR in all copies of the script!
- ***************************************************************/
+ * ============================================================================
+ */
 
 /**
- * Extends IMAGE class object for responsive images
+ * Extends the TypoScript IMAGE object to accommodate responsive and
+ * fluid image techniques. Automatically adds equivalent functionality
+ * to the smarty image plugin.
  *
+ * TypoScript example:
+ *  10 = IMAGE
+ *  10 {
+ *      file = fileadmin/images/myimage.jpg
+ *      file.width = 800
+ *      altText = Hey, I'm responsive!
+ *      params = class="enlarge"
+ *      breakpoint = 1200
+ *      breakpoints = 600:400,400:280,320:160
+ *      breakpoints.320.file.height = 90
+ *  }
  *
- * @author Simon Tuck <stu@rtp.ch>
- * TODO: Refactor & merge functionality of fluid view helper
+ * Smarty example:
+ *  {image
+ *      file = "fileadmin/images/myimage.jpg"
+ *      file.width = "800"
+ *      altText = "Hey, I'm responsive!"
+ *      params = "class=\"enlarge\""
+ *      breakpoint = 1200
+ *      breakpoints = 600:400,400:280,320:160
+ *      breakpoints.320.file.height = 90
+ *  }
+ *
+ * @author  Simon Tuck <stu@rtp.ch>
+ * @link https://github.com/rtp-ch/rtp_imgquery
+ * @todo: Refactor & merge with view helper methods.
  */
 class ux_tslib_content_Image extends tslib_content_Image
 {
@@ -82,7 +94,7 @@ class ux_tslib_content_Image extends tslib_content_Image
      * @param    array        Array of TypoScript properties
      * @return    string        Output
      */
-    public function render($conf = array())
+    public function render(array $conf = array())
     {
         // Initialize the IMAGE object. Note that "tslib_content_Image" is implicitly implemented as a singleton
         // so a unique id is required to differentiate between the various IMAGE objects and the $registry variable
