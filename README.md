@@ -66,7 +66,7 @@ Less than 320 | Version of the image with a width of 160
 
 ###Text & Images Content Element
 
-![*Breakpoint settings for images in content elements*](Documentation/Images/content_element.png)
+![*Breakpoint settings for images in content elements*](https://github.com/rtp-ch/rtp_imgquery/raw/master/Documentation/Images/content_element.png)
 
 
 ##Recommended Reading
