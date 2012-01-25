@@ -1,92 +1,78 @@
 #Responsive Images for TYPO3
-##Requirements
-###General Considerations
-* Offers easy and powerful customizations.
-* Combines responsive image and fluid image techniques.
-* Does not load other images and avoids rendering race conditions.
-* Does not require additional javascript libraries (e.g. jQuery).
-* Executes as quickly as possible (does not have to wait for the DOM ready event).
-* Works without javascript (graceful degradation).
 
-###Features
-* Breakpoint options for TypoScript IMAGE objects.
-* Fluid View Helper.
-* Smarty plugin.
-* Breakpoint options for the standard image content objects ("Text & Images", "Images Only")
+rtp_imgquery is a TYPO3 extension that adds responsive and fluid image techniques to the TypoScript IMAGE object, the default image content elements ("Text & Images", "Images Only") as well as the standard Smarty and Fluid image view helpers.
 
-###Recommended Reading
-* [Responsive IMGs, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs-part-2/)
-* [Google spreadsheet reviewing different solutions](https://docs.google.com/spreadsheet/ccc?key=0AisdYBkuKzZ9dHpzSmd6ZTdhbDdoN21YZ29WRVdlckE&hl=en_US#gid=0)
+
+It is designed to:
+
+* Offer easy and powerful customizations.
+* Combine responsive image and fluid image techniques.
+* Only load a single image and avoid rendering race conditions.
+* Work without any additional javascript libraries (e.g. jQuery).
+* Execute as quickly as possible.
+* Work without javascript (graceful degradation).
+
+##Approach
+The extension is based on the [noscript approach](http://www.cloudfour.com/responsive-imgs-part-2/#toc-anchor-1977-22). The main difference being that images are inserted with **document.write**, i.e. before the page has finished loading. In addition, images are given a width of 100% via the style attribute, making them fluid.
+
+###How it Works
+1. Based on the predefined breakpoint/width settings for an image the extension creates a list of image versions that need to be generated.
+2. The extension instructs TYPO3 to create these image versions.
+3. The extension populates an HTML/JavaScript snippet with the list of image versions and inserts this snippet in place of the original image tag.
+4. The HTML/JavaScript snippet decides which image version to apply while the page is loading.
+
+> The layout of the HTML snippet and the inline JavaScript code that the extension uses can be found in **Resources/Private/Templates**.
+
+##Installation
+1. Clone the extension to your typo3conf extension folder:
+
+		git clone git@github.com:rtp-ch/rtp_imgquery.git typo3conf/ext/rtp_imgquery
+
+2. Install the extension using the extension manager.
+3. Add the TypoScript setup to your template: Template > Info/Modify > Includes > Include static (from extensions) > Responsive Images (rtp_imgquery).
+
+##Configuration
+
+The following examples will create the following four versions of the image fileadmin/images/myimage.jpg:
+
+Screen width  | Image version
+--------------|--------------
+Above 600 | Default image (width = 800)
+Between 400 and 600 | Version of the image with a width of 500
+Between 400 and 320 | Version of the image with a width of 280
+Less than 320 | Version of the image with a width of 160
 
 ###TypoScript
-Options to define breakpoints and their corresponding
 
 	10 = IMAGE
 	10.file = fileadmin/images/myimage.jpg
 	10.file.width = 800
 	10.breakpoint = 1200
-	10.breakpoints = 600:400,400:280,320:160
+	10.breakpoints = 600:500, 400:280, 320:160
 
+###Fluid View Helper Example
 
-Or they can be derived from the defined breakpoints (i.e. the responsive image widths will correspond to the defined breakpoints):
-
-    10 = IMAGE
-    10.file = fileadmin/images/myimage.jpg
-    10.file.width = 1000
-    10.breakpoints = 720,400
-
-###Fluid ViewHelper
-
-The Fluid ViewHelper is an extension of the normal image view helper which accepts a list of breakpoints as an additional parameter:
-
-	<f:imgQuery src="fileadmin/images/myimage.jpg" width="1000" breakpoints="720,400" />
+    {namespace responsive=Tx_RtpImgquery_ViewHelpers}
+    <responsive:image src="fileadmin/images/myimage.jpg" alt="alt text" breakpoint="900" breakpoints="600:500, 400:280, 320:160" />
 
 ###Smarty Plugin
 
-The Smarty plugin is the normal image plugin as it applues the IMAGE content object: 
+    {image
+        file="fileadmin/images/myimage.jpg"
+        file.width="800"
+        breakpoint = 1200
+        breakpoints = 600:500, 400:280, 320:160
+    }
 
-	{image file="fileadmin/images/myimage.jpg" file.width="1000" breakpoints.720.file.width="720" breakpoints.400.file.width="400"}
+###Text & Images Content Element
 
-	{image file="fileadmin/images/myimage.jpg" file.width="1000" breakpoints="720,400"}
+![*Breakpoint settings for images in content elements*](Documentation/Images/content_element.png)
 
 
-##Specifications for rtp_imgquery JS
-
-###HTML Application
-
-    <noscript>
-    	<img src="/images/img/portrait-xlarge.gif" width="714" height="956" alt="" style="width: 100%; height: auto;" />
-    </noscript>
-    <script>
-        var options = {
-            "460" : {
-                "src" : "/images/img/landscape-small.gif",
-                "width" : 460,
-                "height" : 280,
-                "alt" : "Different ALT attribute at breakpoint 460!"
-            },
-            "1024" : {
-                "src" : "/images/img/landscape-medium.gif",
-                "width" : 1024,
-                "height" : 624,
-                "style" : "min-width: 100%;"
-            }
-        };
-        var defaultImage = '<img src="/images/img/portrait-xlarge.gif" width="714" height="956" alt="" style="width: 100%; height: auto;" />';
-    	document.write(imgQuery(defaultImage, options).img());
-    </script>
-
-> *Note: The global variables "options" and "defaultImage" are purely for readability, the correct solution would include the options and the default image as function arguments.*
-
-####Alternative HTML Application
-
-    responsiveImg = new imgQuery(defaultImage, options);
-    document.write(unescape('%3Cimg src="' + responsiveImg.attr('src') + '" width="' + responsiveImg.attr('width') + '" height="' + responsiveImg.attr('width') + '" alt="" style="width: 100%; height: auto;" /%3E'));
-
-###Public API
-
-* **attr('src')**  *getter* Gets an attribute value of the responsive version of the img tag.
-* **attr('src', '/images/img/landscape-small.gif')** *setter* Sets an attribute of the responsive img tag to a given value.
-* **img()** *getter* Gets the complete img tag for the current breakpoint from the default img tag and breakpoint options
-* **breakpoint()** *getter/setter* Globally sets/gets current breakpoint value
-* **screensize()** *getter/setter* Globally sets/gets current screensize value
+##Recommended Reading
+* [Responsive IMGs — Part 1, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs/)
+* [Responsive IMGs Part 2 — In-depth Look at Techniques, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs-part-2/)
+* [Responsive IMGs Part 3 — Future of the IMG Tag, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs-part-3-future-of-the-img-tag/)
+* [Google spreadsheet reviewing different solutions, by Jason Grigsby](https://docs.google.com/spreadsheet/ccc?key=0AisdYBkuKzZ9dHpzSmd6ZTdhbDdoN21YZ29WRVdlckE&hl=en_US#gid=0)
+* [Creating responsive images using the noscript tag, by Mairead Buchan](http://www.headlondon.com/our-thoughts/technology/posts/creating-responsive-images-using-the-noscript-tag)
+* [Demo of the noscript approach, by Antti Peisa](http://www.monoliitti.com/images/)
