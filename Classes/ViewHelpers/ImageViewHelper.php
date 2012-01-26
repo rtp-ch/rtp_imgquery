@@ -9,6 +9,8 @@
  * the terms of the GNU General Public License, either version 3 of the
  * License, or (at your option) any later version.
  *
+ * Copyright 2012 Simon Tuck <stu@rtp.ch>
+ *
  * ============================================================================
  */
 
@@ -17,7 +19,8 @@
  * fluid image techniques.
  *
  * Example:
- * <img alt="alt text" src="my_image.png" width="520" height="375" breakpoint="900" breakpoints="600:300, 400"/>
+ * {namespace responsive=Tx_RtpImgquery_ViewHelpers}
+ * <responsive:image src="EXT:myext/Resources/Public/typo3_logo.png" alt="alt text" breakpoint="900" breakpoints="600:300, 400" />
  *
  *
  * @author  Simon Tuck <stu@rtp.ch>
@@ -36,7 +39,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      *
      * @var string
      */
-    const DEFAULT_LAYOUT      = 'EXT:rtp_imgquery/Resources/Private/Templates/rtp_imgquery.min.html';
+    const DEFAULT_LAYOUT        = 'EXT:rtp_imgquery/Resources/Private/Templates/rtp_imgquery.min.html';
 
     /**
      * Initial content of responsive images layouts

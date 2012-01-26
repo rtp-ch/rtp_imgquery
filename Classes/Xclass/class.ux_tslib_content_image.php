@@ -9,6 +9,8 @@
  * the terms of the GNU General Public License, either version 3 of the
  * License, or (at your option) any later version.
  *
+ * Copyright 2012 Simon Tuck <stu@rtp.ch>
+ *
  * ============================================================================
  */
 
@@ -58,21 +60,21 @@ class ux_tslib_content_Image extends tslib_content_Image
      *
      * @var string
      */
-    const DEFAULT_LAYOUT              = 'EXT:rtp_imgquery/Resources/Private/Templates/rtp_imgquery.min.html';
+    const DEFAULT_LAYOUT                = 'EXT:rtp_imgquery/Resources/Private/Templates/rtp_imgquery.min.html';
 
     /**
      * Default style for responsive images
      *
      * @var string
      */
-    const DEFAULT_STYLE               = 'width: 100%; height: auto';
+    const DEFAULT_STYLE                 = 'width: 100%; height: auto';
 
     /**
      * Initial content of responsive images layouts
      *
      * @var null
      */
-    private $layoutContent            = null;
+    private $layoutContent              = null;
 
     /**
      * TypoScript configuration
@@ -160,8 +162,7 @@ if($this->hasDebug()) {
      */
 
     /**
-     * Parses and returns the responsive image layout content unless all breakpoints point to the
-     * same image. In which case the default image is returned (sans responsiveness).
+     * Parses and returns the responsive image layout content.
      *
      * @return string
      */
@@ -171,7 +172,7 @@ if($this->hasDebug()) {
             $search     = array_keys($this->markers());
             $replace    = $this->markers();
             $content    = $this->layoutContent();
-            $responsiveImage =  html_entity_decode(str_ireplace($search, $replace, $content));
+            $responsiveImage = html_entity_decode(str_ireplace($search, $replace, $content));
         } else {
             $responsiveImage = $this->defaultImage();
         }
@@ -558,6 +559,7 @@ if($this->hasDebug()) {
                     }
 
                 } else {
+                    // TODO: or not to do...?
                     //$breakpointConfigurations[$breakpoint]['file.']['width'] = $this->defaultWidth();
                 }
             }
