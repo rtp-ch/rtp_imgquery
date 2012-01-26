@@ -79,6 +79,7 @@ Less than 320 | Version of the image with a width of 160
 
 ###Advanced Configuration Options
 
+*coming soon...*
 
 ##Recommended Reading
 * [Responsive IMGs — Part 1, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs/)
