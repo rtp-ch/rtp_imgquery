@@ -96,7 +96,7 @@ class ux_tslib_content_Image extends tslib_content_Image
      * @param    array        Array of TypoScript properties
      * @return    string        Output
      */
-    public function render(array $conf = array())
+    public function render($conf = array())
     {
         // Initialize the IMAGE object. Note that "tslib_content_Image" is implicitly implemented as a singleton
         // so a unique id is required to differentiate between the various IMAGE objects and the $registry variable
