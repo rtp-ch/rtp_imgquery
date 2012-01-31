@@ -538,24 +538,30 @@ if($this->hasDebug()) {
 
                 if( $breakpoint !== $this->defaultBreakpoint() ) {
 
-
                     // Regex matches settings like 800:500 where 500 would be a configured image width
                     // for the breakpoint 800
                     if($settings && preg_match('/' . $breakpoint . ':(\w+)/i', $settings, $width)) {
                         $breakpointConfigurations[$breakpoint]['file.']['width'] = $width[1];
-                        // TODO: Height adjustements
-                        //$breakpointConfigurations[$breakpoint]['file.']['height'] =  $this->modifiedHeight($width[1]);
                     } else {
                         $width = $this->modifiedWidth($breakpoint);
                         $breakpointConfigurations[$breakpoint]['file.']['width'] = $width;
-                        // TODO: Height adjustements
-                        //$breakpointConfigurations[$breakpoint]['file.']['height'] =  $this->modifiedHeight($width);
                     }
 
                     if( isset($this->conf['breakpoints.'][$breakpoint . '.']) ) {
                         $breakpointConfigurations[$breakpoint]['file.'] =
                             t3lib_div::array_merge_recursive_overrule((array) $breakpointConfigurations[$breakpoint]['file.'],
                                                                       (array) $this->conf['breakpoints.'][$breakpoint . '.']['file.']);
+                    }
+
+                    // Gets the new height
+                    $breakpointConfigurations[$breakpoint]['file.']['height'] =
+                                        $this->cObj->stdWrap($breakpointConfigurations[$breakpoint]['file.']['height'],
+                                                             $breakpointConfigurations[$breakpoint]['file.']['height.']);
+
+                    // If no height was defined, gets the height from the new width
+                    if(!$breakpointConfigurations[$breakpoint]['file.']['height']) {
+                        $breakpointConfigurations[$breakpoint]['file.']['height'] =
+                                        $this->modifiedHeight($breakpointConfigurations[$breakpoint]['file.']['width']);
                     }
 
                 } else {
