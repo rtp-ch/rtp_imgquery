@@ -81,6 +81,27 @@ Less than 320 | Version of the image with a width of 160
 
 *coming soon...*
 
+###FAQ
+> **Q:** Can I use the extension to change the image quality for certain breakpoints?
+
+> **A:** Yes. The following example defines in image with breakpoints in TypoScript and sets a lower image quality for the breakpoint 320.
+    
+
+	10 = IMAGE
+	10.file = fileadmin/images/myimage.jpg
+	10.file.width = 800
+	10.file.quality = 100
+	// The default breakpoint is 1200
+	10.breakpoint = 1200
+	// Defines image widths for breakpoints 600, 400 and 320
+	10.breakpoints = 600:400,400:280,320:160
+	// After 320 we want a lower image quality than the default TYPO3 settings
+	10.breakpoints.320.file = GIFBUILDER
+	10.breakpoints.320.file {
+        format = jpg
+        quality = 60
+    }
+
 ##Recommended Reading
 * [Responsive IMGs — Part 1, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs/)
 * [Responsive IMGs Part 2 — In-depth Look at Techniques, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs-part-2/)
