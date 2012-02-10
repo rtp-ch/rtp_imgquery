@@ -53,18 +53,7 @@ Less than 320 | Version of the image with a width of 160
 
 > The IMAGE content object has been extended to accept breakpoint options. The "breakpoint" setting defines the default breakpoint for the IMAGE object. The "breakpoints" setting contains additional screen width / image width instructions.
 
-####Smarty Plugin
-
-    {image
-        file = "fileadmin/images/myimage.jpg"
-        file.width = "800"
-        breakpoint = 1200
-        breakpoints = 600:500, 400:280, 320:160
-    }
-
-> Because the smarty extension already understands TypoScript there's no special responsive image plugin for smarty. Any valid TypoScript IMAGE setting can be passed as a parameter to the image plugin.
-
-####Fluid View Helper Example
+####Fluid View Helper
 
     {namespace responsive=Tx_RtpImgquery_ViewHelpers}
     <responsive:image src="fileadmin/images/myimage.jpg" alt="alt text" breakpoint="900" breakpoints="600:500, 400:280, 320:160" />
@@ -77,15 +66,26 @@ Less than 320 | Version of the image with a width of 160
 
 > The extension TypoScript in **Configuration/TypoScript/** contains default breakpoint settings for image content elements.
 
+####Smarty Plugin
+
+    {image
+        file = "fileadmin/images/myimage.jpg"
+        file.width = "800"
+        breakpoint = 1200
+        breakpoints = 600:500, 400:280, 320:160
+    }
+
+> Because the smarty extension already understands TypoScript there's no special responsive image plugin for smarty. Any valid TypoScript IMAGE setting can be passed as a parameter to the image plugin.
+
 ###Advanced Configuration Options
 
 *coming soon...*
 
 ###FAQ
-> **Q:** Can I use the extension to change the image quality for certain breakpoints?
 
-> **A:** Yes. The following example defines in image with breakpoints in TypoScript and sets a lower image quality for the breakpoint 320.
-    
+####Changing image quality for breakpoints    
+*Is it possible to change the image quality for certain breakpoints?* Yes. The following example defines in image with breakpoints in TypoScript and sets a lower image quality for the breakpoint 320. 
+  
 
 	10 = IMAGE
 	10.file = fileadmin/images/myimage.jpg
