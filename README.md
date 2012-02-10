@@ -90,7 +90,6 @@ Less than 320 | Version of the image with a width of 160
 	10 = IMAGE
 	10.file = fileadmin/images/myimage.jpg
 	10.file.width = 800
-	10.file.quality = 100
 	// The default breakpoint is 1200
 	10.breakpoint = 1200
 	// Defines image widths for breakpoints 600, 400 and 320
