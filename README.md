@@ -83,9 +83,9 @@ Less than 320 | Version of the image with a width of 160
 
 ###FAQ
 
-####Changing image quality for breakpoints    
-*Is it possible to change the image quality for certain breakpoints?* Yes. The following example defines in image with breakpoints in TypoScript and sets a lower image quality for the breakpoint 320. 
-  
+####Changing image quality for breakpoints
+*Is it possible to change the image quality for certain breakpoints?* Yes. The following example defines in image with breakpoints in TypoScript and sets a lower image quality for the breakpoint 320.
+
 
 	10 = IMAGE
 	10.file = fileadmin/images/myimage.jpg
@@ -108,3 +108,4 @@ Less than 320 | Version of the image with a width of 160
 * [Google spreadsheet reviewing different solutions, by Jason Grigsby](https://docs.google.com/spreadsheet/ccc?key=0AisdYBkuKzZ9dHpzSmd6ZTdhbDdoN21YZ29WRVdlckE&hl=en_US#gid=0)
 * [Creating responsive images using the noscript tag, by Mairead Buchan](http://www.headlondon.com/our-thoughts/technology/posts/creating-responsive-images-using-the-noscript-tag)
 * [Demo of the noscript approach, by Antti Peisa](http://www.monoliitti.com/images/)
+* [Responsive Images: How they Almost Worked and What We Need](http://www.alistapart.com/articles/responsive-images-how-they-almost-worked-and-what-we-need/)
