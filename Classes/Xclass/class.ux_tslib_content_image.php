@@ -638,9 +638,11 @@ if($this->hasDebug()) {
 
             // A more detailed configuration is breakpoints.x.file.width = n where x is the breakpoint
             // (i.e. viewport width) and n is the corresponding image width.
-            $configuredBreakpoints = array_filter(array_map('intval', array_keys($this->conf['breakpoints.'])));
-            if( is_array($configuredBreakpoints) && !empty($configuredBreakpoints) ) {
-                $breakpoints = array_merge($breakpoints, $configuredBreakpoints);
+            if( is_array($this->conf['breakpoints.']) ){
+                $configuredBreakpoints = array_filter(array_map('intval', array_keys($this->conf['breakpoints.'])));
+                if( is_array($configuredBreakpoints) && !empty($configuredBreakpoints) ) {
+                    $breakpoints = array_merge($breakpoints, $configuredBreakpoints);
+                }
             }
 
             // If breakpoints have been defined or if a breakpoint has explicitly been set for the default image (i.e.
