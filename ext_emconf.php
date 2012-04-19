@@ -29,12 +29,12 @@ $EM_CONF[$_EXTKEY] = array(
 	'clearCacheOnLoad' => 0,
 	'lockType' => '',
 	'author_company' => '',
-	'version' => '0.6.6',
+	'version' => '0.7.1',
 	'constraints' => array(
 		'depends' => array(
 		),
 		'conflicts' => array(
-            // Requieres smarty version 1.11.0 for the smarty plugin
+            // Requires smarty version 1.11.0 for the smarty plugin
             'smarty' => '0.0.0-1.10.5',
 		),
 		'suggests' => array(

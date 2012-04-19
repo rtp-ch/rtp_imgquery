@@ -194,8 +194,8 @@ if($this->hasDebug()) {
      */
     private function style()
     {
-        if( !isset($this->registry[$this->id]['style']) ) {
-            if( isset($this->conf['breakpoints.']['style']) ) {
+        if (!isset($this->registry[$this->id]['style']) ) {
+            if (isset($this->conf['breakpoints.']['style']) ) {
                 $style = $this->conf['breakpoints.']['style'];
             } else {
                 $style = self::DEFAULT_STYLE;
@@ -206,6 +206,22 @@ if($this->hasDebug()) {
             $this->registry[$this->id]['style'] = $style;
         }
         return $this->registry[$this->id]['style'];
+    }
+
+    /**
+     * Checks if default inline styles should be set
+     *
+     * @return bool
+     */
+    private function hasStyle()
+    {
+        $hasInlineStyle = true;
+        if (isset($this->conf['breakpoints.']['style'])) {
+            if (preg_match("/^(off|false|no|none|0)$/i", trim($this->conf['breakpoints.']['style']))) {
+                $hasInlineStyle = false;
+            }
+        }
+        return $hasInlineStyle;
     }
 
     /**
@@ -296,10 +312,12 @@ if($this->hasDebug()) {
                     $impliedConfiguration = $this->impliedConfiguration($breakpoint);
                     $image = $this->cObj->cImage($impliedConfiguration['file'], $impliedConfiguration);
                     // Inserts image styles
-                    if (preg_match('/style\s*=\s*"([^"]+)"/i', $image)) {
-                        $image = preg_replace('%style\s*=\s*"([^"]+)"%i', ' style="' . $this->style() . ' \1"', $image);
-                    } else {
-                        $image = preg_replace('%(\s*/?>$)%im', ' style="' . $this->style() . '"\1', $image);
+                    if ($this->hasStyle()) {
+                        if (preg_match('/style\s*=\s*"([^"]+)"/i', $image)) {
+                            $image = preg_replace('%style\s*=\s*"([^"]+)"%i', ' style="' . $this->style() . ' \1"', $image);
+                        } else {
+                            $image = preg_replace('%(\s*/?>$)%im', ' style="' . $this->style() . '"\1', $image);
+                        }
                     }
                     $this->registry[$this->id]['images'][$breakpoint] = $image;
                 }
@@ -638,9 +656,11 @@ if($this->hasDebug()) {
 
             // A more detailed configuration is breakpoints.x.file.width = n where x is the breakpoint
             // (i.e. viewport width) and n is the corresponding image width.
-            $configuredBreakpoints = array_filter(array_map('intval', array_keys($this->conf['breakpoints.'])));
-            if( is_array($configuredBreakpoints) && !empty($configuredBreakpoints) ) {
-                $breakpoints = array_merge($breakpoints, $configuredBreakpoints);
+            if( is_array($this->conf['breakpoints.']) ){
+                $configuredBreakpoints = array_filter(array_map('intval', array_keys($this->conf['breakpoints.'])));
+                if( is_array($configuredBreakpoints) && !empty($configuredBreakpoints) ) {
+                    $breakpoints = array_merge($breakpoints, $configuredBreakpoints);
+                }
             }
 
             // If breakpoints have been defined or if a breakpoint has explicitly been set for the default image (i.e.
