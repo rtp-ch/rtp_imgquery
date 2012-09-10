@@ -125,13 +125,22 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      * @param null $layout
      * @return string
      */
-    public function render($src, $width = null, $height = null, $minWidth = null, $minHeight = null, $maxWidth = null,
-                           $maxHeight = null, $breakpoints = null, $breakpoint = null, $layout = null)
-    {
+    public function render(
+        $src,
+        $width = null,
+        $height = null,
+        $minWidth = null,
+        $minHeight = null,
+        $maxWidth = null,
+        $maxHeight = null,
+        $breakpoints = null,
+        $breakpoint = null,
+        $layout = null
+    ) {
         $this->setConf($src, $width, $height, $minWidth, $minHeight, $maxWidth,
                        $maxHeight, $breakpoints, $breakpoint, $layout);
 
-if( 1 === 0 ) {
+if (1 === 0 ) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         '****************'  => '****************',
         'conf'              => $this->conf,
@@ -139,12 +148,12 @@ if( 1 === 0 ) {
     ));
 }
 
-        if( $this->hasBreakpoints() ) {
+        if ($this->hasBreakpoints() ) {
             // TODO: An option to define/override the style
             $this->tag->addAttribute('style', self::IMAGE_STYLE);
             $imageHtml = $this->responsiveImage();
 
-if( 1 === 0 ) {
+if (1 === 0 ) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         'id'                => $this->id(),
         'defaultImage'      => $this->defaultImage(),
@@ -162,7 +171,7 @@ if( 1 === 0 ) {
             $imageHtml = $this->defaultImage();
         }
 
-if( 1 === 0 ) {
+if (1 === 0 ) {
     t3lib_utility_Debug::debugInPopUpWindow(array(
         'imageHtml'         => $imageHtml,
         '****************'  => '****************',
@@ -182,7 +191,7 @@ if( 1 === 0 ) {
      */
     private function responsiveImage()
     {
-        if(count($this->breakpoints()) > 1) {
+        if (count($this->breakpoints()) > 1) {
             $search     = array_keys($this->markers());
             $replace    = $this->markers();
             $content    = $this->layoutContent();
@@ -206,9 +215,10 @@ if( 1 === 0 ) {
 
     private function defaultBreakpoint()
     {
-        if( is_null($this->defaultBreakpoint) ) {
-            if( $this->conf['breakpoint'] ) {
+        if (is_null($this->defaultBreakpoint) ) {
+            if ($this->conf['breakpoint'] ) {
                 $this->defaultBreakpoint = $this->conf['breakpoint'];
+
             } else {
                 $this->defaultBreakpoint = $this->defaultWidth();
             }
@@ -234,13 +244,13 @@ if( 1 === 0 ) {
      */
     private function breakpoints()
     {
-        if( is_null($this->breakpoints) ) {
+        if (is_null($this->breakpoints) ) {
 
             $breakpoints = t3lib_div::trimExplode(',', $this->conf['breakpoints'], true);
 
             // Adds the default breakpoint to the list if a breakpoint configuration exists or
             // breakpoints have been defined.
-            if(!empty($breakpoints) || $this->hasDefaultBreakpoint()) {
+            if (!empty($breakpoints) || $this->hasDefaultBreakpoint()) {
                 $breakpoints[] = $this->defaultBreakpoint();
                 // Ensures the list is unique and converts values like 610:400 to 610
                 $breakpoints = array_map('intval', array_unique($breakpoints));
@@ -267,14 +277,14 @@ if( 1 === 0 ) {
      */
     private function breakpointConfigurations()
     {
-        if( is_null($this->breakpointConfigurations) ) {
+        if (is_null($this->breakpointConfigurations) ) {
 
             $this->breakpointConfigurations = array();
 
-            if($this->hasBreakpoints()) {
+            if ($this->hasBreakpoints()) {
 
                 // Breakpoints configuration
-                if( isset($this->conf['breakpoints']) ) {
+                if (isset($this->conf['breakpoints']) ) {
 
                     // Gets the list of breakpoints and their respective widths
                     $breakpoints = t3lib_div::trimExplode(',', $this->conf['breakpoints'], true);
@@ -285,11 +295,11 @@ if( 1 === 0 ) {
                         $breakpointSettings = t3lib_div::trimExplode(':', $breakpoint, true, 2);
                         $breakpointValue = intval($breakpointSettings[0]);
 
-                        if($breakpointValue > 0) {
+                        if ($breakpointValue > 0) {
 
                             // The image width for the breakpoint has either been defined or is derived
                             // from the default width and default breakpoint.
-                            if( intval($breakpointSettings[1]) > 0 ) {
+                            if (intval($breakpointSettings[1]) > 0 ) {
                                 $breakpointWidth = intval($breakpointSettings[1]);
                             } else {
                                 $breakpointWidth = $this->getBreakpointWidth($breakpointValue);
@@ -323,13 +333,13 @@ if( 1 === 0 ) {
 
     private function defaultWidth()
     {
-        if( is_null($this->defaultWidth) ) {
+        if (is_null($this->defaultWidth) ) {
             $this->defaultWidth = false;
-            if(preg_match('/width\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
+            if (preg_match('/width\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
                 // Avoid values which are not numeric, e.g. percentages
-                if( is_numeric($match[1]) ) {
+                if (is_numeric($match[1]) ) {
                     $this->defaultWidth = $match[1];
-                } elseif($this->defaultSource()) {
+                } elseif ($this->defaultSource()) {
                     // TODO: Get image dimensions from image source
                 }
             }
@@ -344,13 +354,13 @@ if( 1 === 0 ) {
 
     private function defaultHeight()
     {
-        if( is_null($this->defaultHeight) ) {
+        if (is_null($this->defaultHeight) ) {
             $this->defaultHeight = false;
-            if(preg_match('/height\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
+            if (preg_match('/height\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
                 // Avoid values which are not numeric, e.g. percentages
-                if( is_numeric($match[1]) ) {
+                if (is_numeric($match[1]) ) {
                     $this->defaultHeight = $match[1];
-                } elseif($this->defaultSource()) {
+                } elseif ($this->defaultSource()) {
                     // TODO: Get image dimensions from image source
                 }
             }
@@ -360,14 +370,14 @@ if( 1 === 0 ) {
 
     private function getBreakpointWidth($breakpoint)
     {
-        if($this->hasDefaultWidth()) {
+        if ($this->hasDefaultWidth()) {
             return floor(($breakpoint / $this->defaultBreakpoint()) * $this->defaultWidth());
         }
     }
 
     private function getHeightForWidth($width)
     {
-        if($this->hasDefaultWidth() && $this->hasDefaultHeight()) {
+        if ($this->hasDefaultWidth() && $this->hasDefaultHeight()) {
             return ($width / $this->defaultWidth()) * $this->defaultHeight();
         }
     }
@@ -385,7 +395,7 @@ if( 1 === 0 ) {
      */
     private function id()
     {
-        if( is_null($this->id) ) {
+        if (is_null($this->id) ) {
             $this->id = md5(uniqid(mt_rand(), true));
         }
         return $this->id;
@@ -403,9 +413,18 @@ if( 1 === 0 ) {
      * @param $breakpoint
      * @param $layout
      */
-    private function setConf($src, $width, $height, $minWidth, $minHeight,
-                             $maxWidth, $maxHeight, $breakpoints, $breakpoint, $layout)
-    {
+    private function setConf(
+        $src,
+        $width,
+        $height,
+        $minWidth,
+        $minHeight,
+        $maxWidth,
+        $maxHeight,
+        $breakpoints,
+        $breakpoint,
+        $layout
+    ) {
         $this->conf['src']          = $src;
         $this->conf['width']        = $width;
         $this->conf['height']       = $height;
@@ -429,7 +448,7 @@ if( 1 === 0 ) {
      */
     public function defaultImage()
     {
-        if( is_null($this->defaultImage) ) {
+        if (is_null($this->defaultImage) ) {
             $this->defaultImage = parent::render(
                 $this->conf['src'],
                 $this->conf['width'],
@@ -452,11 +471,11 @@ if( 1 === 0 ) {
      */
     private function defaultSource()
     {
-        if( is_null($this->defaultSource) ) {
+        if (is_null($this->defaultSource) ) {
             $this->defaultSource = false;
-            if(preg_match('/src\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
+            if (preg_match('/src\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
                 $defaultSource = t3lib_div::getFileAbsFileName($match[1]);
-                if(is_readable($defaultSource)) {
+                if (is_readable($defaultSource)) {
                     $this->defaultSource = $defaultSource;
                 }
             }
@@ -473,7 +492,7 @@ if( 1 === 0 ) {
     private function image($breakpoint)
     {
         $images = $this->images();
-        if(is_string($images[$breakpoint])) {
+        if (is_string($images[$breakpoint])) {
             $image = $images[$breakpoint];
         } else {
             $image = null;
@@ -488,14 +507,14 @@ if( 1 === 0 ) {
      */
     private function images()
     {
-        if( is_null($this->images) ) {
+        if (is_null($this->images) ) {
 
             $this->images = array();
 
-            if($this->hasBreakpoints()) {
+            if ($this->hasBreakpoints()) {
 
                 // Renders an image for each breakpoint/width combination
-                foreach($this->breakpoints() as $breakpoint) {
+                foreach ($this->breakpoints() as $breakpoint) {
                     $width = $this->breakpointConfiguration($breakpoint);
                     $this->images[$breakpoint] = parent::render(
                         $this->conf['src'],
@@ -525,7 +544,7 @@ if( 1 === 0 ) {
     private function attribute($breakpoint)
     {
         $attributes = $this->attributes();
-        if(is_array($attributes[$breakpoint]) && !empty($attributes[$breakpoint])) {
+        if (is_array($attributes[$breakpoint]) && !empty($attributes[$breakpoint])) {
             $attribute = $attributes[$breakpoint];
         } else {
             $attribute = null;
@@ -540,11 +559,11 @@ if( 1 === 0 ) {
      */
     private function attributes()
     {
-        if( is_null($this->attributes) ) {
+        if (is_null($this->attributes) ) {
             $this->attributes = array();
             foreach ($this->images() as $breakpoint => $image) {
                 // http://stackoverflow.com/questions/317053/regular-expression-for-extracting-tag-attributes
-                if(preg_match_all('/(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?/s', $image, $attributes)) {
+                if (preg_match_all('/(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?/s', $image, $attributes)) {
                     $this->attributes[$breakpoint] =  array_combine($attributes[1], $attributes[2]);
                 }
             }
@@ -565,7 +584,7 @@ if( 1 === 0 ) {
      */
     private function layoutContent()
     {
-        if( is_null(self::$layoutContent[$this->layout()]) ) {
+        if (is_null(self::$layoutContent[$this->layout()]) ) {
             self::$layoutContent[$this->layout()] = t3lib_div::getURL($this->layout());
         }
         return self::$layoutContent[$this->layout()];
@@ -578,11 +597,11 @@ if( 1 === 0 ) {
      */
     private function layout()
     {
-        if( is_null($this->layout) ) {
+        if (is_null($this->layout) ) {
             $this->layout = t3lib_div::getFileAbsFileName(self::DEFAULT_LAYOUT);
-            if( isset($this->conf['layout']) ) {
+            if (isset($this->conf['layout']) ) {
                 $layout = $this->conf['layout'];
-                if( is_readable($layout) ) {
+                if (is_readable($layout) ) {
                     $this->layout = $layout;
                 }
             }
@@ -597,7 +616,7 @@ if( 1 === 0 ) {
      */
     private function markers()
     {
-        if( is_null($this->markers) ) {
+        if (is_null($this->markers) ) {
             $this->markers = array(
                 '###DEFAULT_IMAGE###'       => $this->defaultImage(),
                 '###DEFAULT_WIDTH###'       => $this->defaultWidth(),
