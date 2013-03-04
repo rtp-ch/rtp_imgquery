@@ -77,9 +77,14 @@ Less than 320 | Version of the image with a width of 160
 
 > Because the smarty extension already understands TypoScript there's no special responsive image plugin for smarty. Any valid TypoScript IMAGE setting can be passed as a parameter to the image plugin.
 
-###Advanced Configuration Options
+###Configuration Options
 
-*coming soon...*
+####Disabling the Fluid CSS Style
+The extension inserts inline CSS into images to make them fluid ```style="width: 100%; height: auto;"```. This behaviour can be disabled by unsetting the style value of the breakpoints configuration:
+
+```
+styles.content.breakpoints.style =
+```
 
 ###FAQ
 
