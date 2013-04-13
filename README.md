@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/rtp-ch/rtp_imgquery.png)](https://travis-ci.org/rtp-ch/rtp_imgquery.png)
+
 #Responsive Images for TYPO3
 
 rtp_imgquery is a TYPO3 extension that adds responsive and fluid image techniques to the TypoScript IMAGE object, the default image content elements ("Text & Images", "Images Only") as well as the standard [Smarty](https://github.com/rtp-ch/smarty) and Fluid image view helpers.
