@@ -1,0 +1,127 @@
+extends imgQuery
+
+block test
+    script(type='text/javascript')
+        // Deliberatly without var so that imagesIn, breakpointsIn and ratiosIn are global properties
+        // which can be deleted.
+        imagesIn = {
+            "1":    [
+                '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
+                '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
+                '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">'
+            ],
+            "1.5": [
+                '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
+                '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
+                '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">'
+            ]
+        },
+        breakpointsIn = [300,600,800,9000],
+        ratiosIn = [1,1.5];
+
+        // Device Pixel ratio
+        imgQry.ratios = {};
+        imgQry.ratio = 1;
+
+        // Window width
+        imgQry.width = 500;
+
+    |<script type="text/javascript">
+    include ../../Build/js/imgQuery.min.js
+    | </script>
+
+    script(type='text/javascript')
+
+        var initialImageSelection = imgQry.images[[imagesIn, breakpointsIn, ratiosIn]],
+            expectedInitialImage = imagesIn['1'][1];
+
+        test('Initial image selection', function() {
+            equal(initialImageSelection, expectedInitialImage, 'Expected first image to be second image for pixel ratio 1');
+        });
+
+    script(type='text/javascript')
+
+        var initialCache = imgQry.images;
+
+        test('Cache contains first result.', function() {
+            var count = 0,
+                image;
+            for (image in initialCache) {
+                if (initialCache.hasOwnProperty(image)) {
+                    count += 1;
+                }
+            }
+            equal(count, 1, 'Expecting global cache to contain first result');
+        });
+
+    script(type='text/javascript')
+
+        delete(imagesIn);
+        delete(breakpointsIn);
+        delete(ratiosIn);
+
+        var initialImagasIn = typeof(imagesIn),
+            initialBreakpointsIn = typeof(breakpointsIn),
+            initialRatiosIn = typeof(ratiosIn);
+
+        test('Arguments have been cleared', function() {
+            equal(initialImagasIn, 'undefined', 'Expecting imagesIn to be undefined.');
+            equal(initialBreakpointsIn, 'undefined', 'Expecting breakpointsIn to be undefined.');
+            equal(initialRatiosIn, 'undefined', 'Expecting ratiosIn to be undefined.');
+        });
+
+    script(type='text/javascript')
+        // imagesIn, breakpointsIn and ratiosIn are variables and not (as before) properties of the global object.
+        var imagesIn = {
+                "1":    [
+                    '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
+                    '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
+                    '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">'
+                ],
+                "1.5": [
+                    '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
+                    '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
+                    '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">'
+                ]
+            },
+            breakpointsIn = [300,600,800,9000],
+            ratiosIn = [1,1.5];
+
+            // Device Pixel ratio
+            imgQry.ratios = {};
+            imgQry.ratio = 1;
+
+        // Window width
+        imgQry.width = 500;
+
+    |<script type="text/javascript">
+    include ../../Build/js/imgQuery.min.js
+    | </script>
+
+    script(type='text/javascript')
+
+        var secondImageSelection = imgQry.images[[imagesIn, breakpointsIn, ratiosIn]],
+            expectedSecondImage = imagesIn['1'][1];
+
+        test('Cached image selection', function() {
+            equal(secondImageSelection, initialImageSelection, 'Expected second image to be the same as first');
+            equal(secondImageSelection, expectedSecondImage, 'Expected second image to be second image for pixel ratio 1');
+        });
+
+    script(type='text/javascript')
+
+        var finalCache = imgQry.images;
+
+        test('Cache contains one result', function() {
+
+            var count = 0,
+                image;
+
+            for (image in finalCache) {
+                if (imgQry.images.hasOwnProperty(image)) {
+                    count += 1;
+                }
+            }
+
+            equal(count, 1, 'Expected global cache to contain only one result');
+        });

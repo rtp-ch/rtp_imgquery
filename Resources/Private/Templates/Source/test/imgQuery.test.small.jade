@@ -1,0 +1,44 @@
+extends imgQuery
+
+block test
+    script(type='text/javascript')
+        var imagesIn = {
+                "1":    [
+                    '<img src="Images/pixel_ratio_1/400.gif" width="400" height="400">',
+                    '<img src="Images/pixel_ratio_1/300.gif" width="300" height="300">',
+                    '<img src="Images/pixel_ratio_1/750.gif" width="750" height="750">',
+                    '<img src="Images/pixel_ratio_1/900.gif" width="900" height="900">'
+                ],
+                "1.5": [
+                    '<img src="Images/pixel_ratio_1_5/400.gif" width="400" height="400">',
+                    '<img src="Images/pixel_ratio_1_5/300.gif" width="300" height="300">',
+                    '<img src="Images/pixel_ratio_1_5/750.gif" width="750" height="750">',
+                    '<img src="Images/pixel_ratio_1_5/900.gif" width="900" height="900">'
+                ],
+                "2": [
+                    '<img src="Images/pixel_ratio_2/400.gif" width="400" height="400">',
+                    '<img src="Images/pixel_ratio_2/300.gif" width="300" height="300">',
+                    '<img src="Images/pixel_ratio_2/750.gif" width="750" height="750">',
+                    '<img src="Images/pixel_ratio_2/900.gif" width="900" height="900">'
+                ]
+            },
+            breakpointsIn = [500,700,800,1000],
+            ratiosIn = [1,1.5,2];
+
+        // Device Pixel ratio
+        imgQry.ratios = {};
+        imgQry.ratio = 2.2;
+
+        // Window width
+        imgQry.width = 300;
+
+    |<script type="text/javascript">
+    include ../../Build/js/imgQuery.min.js
+    | </script>
+
+    script(type='text/javascript')
+        test('Small image selection for window width 300', function() {
+            var actualImage = imgQry.images[[imagesIn, breakpointsIn, ratiosIn]],
+                expectedImage = imagesIn['2'][0];
+            equal(actualImage, expectedImage, 'Expected smallest image for pixel ratio 2');
+        });

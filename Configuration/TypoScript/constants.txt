@@ -1,6 +1,6 @@
 
 // The layout of the HTML/JavaScript code which is inserted for responsive image
-styles.content.breakpoints.layout = EXT:rtp_imgquery/Resources/Private/Templates/rtp_imgquery.min.html
+styles.content.breakpoints.layout = EXT:rtp_imgquery/Resources/Private/Templates/Build/html/imgQuery.html
 
 // The default inline style of responsive images
 // (set this to width: 100%; height: auto; for fluid image sizes)
@@ -13,3 +13,7 @@ styles.content.breakpoints.default =
 // Default breakpoints for images in "Text with images" and "Images only content elements. Formatted
 // as breakpoint:width, breakpoint:width
 styles.content.breakpoints =
+
+// Default device pixel ratios used to generate additional images with equivalent resolutions for
+// retina enabled devices
+styles.content.pixelRatios = 1.5, 2

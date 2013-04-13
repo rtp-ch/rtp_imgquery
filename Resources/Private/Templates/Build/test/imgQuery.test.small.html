@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>rtp_imgQuery Tests</title>
+    <link rel="stylesheet" href="qunit/qunit.css">
+    <script type="text/javascript">
+      var imgQry = {};
+      imgQry.images = {};
+      imgQry.ratios = {};
+      
+    </script>
+  </head>
+  <body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="qunit/qunit.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var imagesIn = {
+              "1":    [
+                  '<img src="Images/pixel_ratio_1/400.gif" width="400" height="400">',
+                  '<img src="Images/pixel_ratio_1/300.gif" width="300" height="300">',
+                  '<img src="Images/pixel_ratio_1/750.gif" width="750" height="750">',
+                  '<img src="Images/pixel_ratio_1/900.gif" width="900" height="900">'
+              ],
+              "1.5": [
+                  '<img src="Images/pixel_ratio_1_5/400.gif" width="400" height="400">',
+                  '<img src="Images/pixel_ratio_1_5/300.gif" width="300" height="300">',
+                  '<img src="Images/pixel_ratio_1_5/750.gif" width="750" height="750">',
+                  '<img src="Images/pixel_ratio_1_5/900.gif" width="900" height="900">'
+              ],
+              "2": [
+                  '<img src="Images/pixel_ratio_2/400.gif" width="400" height="400">',
+                  '<img src="Images/pixel_ratio_2/300.gif" width="300" height="300">',
+                  '<img src="Images/pixel_ratio_2/750.gif" width="750" height="750">',
+                  '<img src="Images/pixel_ratio_2/900.gif" width="900" height="900">'
+              ]
+      },
+          breakpointsIn = [500,700,800,1000],
+          ratiosIn = [1,1.5,2];
+          
+      // Device Pixel ratio
+      imgQry.ratios = {};
+      imgQry.ratio = 2.2;
+      
+      // Window width
+      imgQry.width = 300;
+      
+    </script><script type="text/javascript">({write:function(i){"loading"===document.readyState&&document.write(i)},getClosest:function(i,t){"use strict";for(var r=i.length,e=0;r>e&&!(i[e]>=t);)e+=1;return e=e===r?r-1:e},imgQry:function(i,t,r,e){"use strict";var o,m=Array.prototype.slice.call(arguments,1);i.imgQry===void 0&&(i.imgQry={},i.imgQry.images={},i.imgQry.ratios={}),i.imgQry.width===void 0&&(i.imgQry.width=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth||0),i.imgQry.width===void 0&&(i.imgQry.ratio=i.devicePixelRatio!==void 0?i.devicePixelRatio:1),i.imgQry.images[m]===void 0&&(i.imgQry.ratios[e]===void 0&&(i.imgQry.ratios[e]=e[this.getClosest(e,i.imgQry.ratio)]),o=this.getClosest(r,i.imgQry.width),i.imgQry.images[m]=t[i.imgQry.ratios[e]][o]),this.write(i.imgQry.images[m])}}).imgQry(this,imagesIn,breakpointsIn,ratiosIn);</script>
+    <script type="text/javascript">
+      test('Small image selection for window width 300', function() {
+          var actualImage = imgQry.images[[imagesIn, breakpointsIn, ratiosIn]],
+              expectedImage = imagesIn['2'][0];
+          equal(actualImage, expectedImage, 'Expected smallest image for pixel ratio 2');
+      });
+    </script>
+  </body>
+</html>

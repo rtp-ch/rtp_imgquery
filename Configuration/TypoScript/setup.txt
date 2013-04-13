@@ -12,4 +12,6 @@ tt_content.image.20.1 {
     breakpoints.layout = {$styles.content.breakpoints.layout}
 
     breakpoints.style = {$styles.content.breakpoints.style}
+
+    pixelRatios = {$styles.content.breakpoints.ratios}
 }

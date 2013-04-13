@@ -1,0 +1,29 @@
+{
+  "name": "rtp_imgquery",
+  "title": "Responsive Images for TYPO3",
+  "version": "2.0.0-alpha.1",
+  "description": "TYPO3 extension that adds responsive and fluid image techniques to the TypoScript IMAGE object, the default image content elements (\"Text & Images\", \"Images Only\") as well as the standard Smarty and Fluid image view helpers",
+  "scripts": {
+    "test": "Grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rtp-ch/rtp_imgquery.git"
+  },
+  "keywords": [
+    "TYPO3",
+    "responsive"
+  ],
+  "author": "Simon Tuck",
+  "license": "GPLv3",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.4.3",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-jade": "~0.5.0",
+    "grunt-contrib-qunit": "~0.2.1",
+    "PortableCGL": "https://github.com/rtp-ch/PortableCGL/tarball/master",
+    "grunt-contrib-copy": "~0.4.1"
+  }
+}
