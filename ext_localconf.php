@@ -17,5 +17,5 @@ $GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['tslib/content/class.tslib_con
 
 // new XCLASS mapping that is used by TYPO3 6.0+
 $GLOBALS['TYPO3_CONF_VARS']['SYS']['Objects']['TYPO3\\CMS\\Frontend\\ContentObject\\ImageContentObject'] = array(
-    'className' => 'Rtp\\RtpImgquery\\Xclass\\ImageContentObject'
+    'className' => 'RTP\\RtpImgquery\\Xclass\\ImageQueryContentObject'
 );
