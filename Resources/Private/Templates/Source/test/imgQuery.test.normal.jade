@@ -3,21 +3,21 @@ extends imgQuery
 block test
     script(type='text/javascript')
         var imagesIn = {
-            "1":    [
-                '<img src="Images/pixel_ratio_1/300.gif" width="300" height="300">',
-                '<img src="Images/pixel_ratio_1/600.gif" width="600" height="600">',
-                '<img src="Images/pixel_ratio_1/800.gif" width="800" height="800">'
-            ],
-            "1.5": [
-                '<img src="Images/pixel_ratio_1_5/300.gif" width="300" height="300">',
-                '<img src="Images/pixel_ratio_1_5/600.gif" width="600" height="600">',
-                '<img src="Images/pixel_ratio_1_5/800.gif" width="800" height="800">'
-            ],
-            "2": [
-                '<img src="Images/pixel_ratio_2/300.gif" width="300" height="300">',
-                '<img src="Images/pixel_ratio_2/600.gif" width="600" height="600">',
-                '<img src="Images/pixel_ratio_2/800.gif" width="800" height="800">'
-            ]
+                "1": {
+                    "400" : '<img src="Images/pixel_ratio_1/300.gif" width="300" height="300">',
+                    "800" : '<img src="Images/pixel_ratio_1/600.gif" width="600" height="600">',
+                    "1200" : '<img src="Images/pixel_ratio_1/800.gif" width="800" height="800">'
+                },
+                "1.5": {
+                    "400" : '<img src="Images/pixel_ratio_1_5/300.gif" width="300" height="300">',
+                    "800" : '<img src="Images/pixel_ratio_1_5/600.gif" width="600" height="600">',
+                    "1200" : '<img src="Images/pixel_ratio_1_5/800.gif" width="800" height="800">'
+                },
+                "2": {
+                    "400" : '<img src="Images/pixel_ratio_2/300.gif" width="300" height="300">',
+                    "800" : '<img src="Images/pixel_ratio_2/600.gif" width="600" height="600">',
+                    "1200" : '<img src="Images/pixel_ratio_2/800.gif" width="800" height="800">'
+                }
             },
             breakpointsIn = [400,800,1200],
             ratiosIn = [1,1.5,2];
@@ -35,7 +35,7 @@ block test
 
     script(type='text/javascript')
         test('Normal image selection for window width 700', function() {
-            var actualImage = imgQry.images[[imagesIn, breakpointsIn, ratiosIn]],
-                expectedImage = imagesIn['1'][1];
+            var actualImage = imgQry.images[[breakpointsIn, imagesIn, ratiosIn]],
+                expectedImage = imagesIn["1"]["800"];
             equal(actualImage, expectedImage, 'Expected first image for pixel ratio 1');
         });

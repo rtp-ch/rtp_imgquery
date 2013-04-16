@@ -8,6 +8,7 @@
         <languageKey index="default" type="array">
             <label index="tt_content.tx_rtpimgquery_breakpoint">Default Breakpoint (current image width)</label>
             <label index="tt_content.tx_rtpimgquery_breakpoints">Breakpoints (one per line "breakpoint : image width", e.g. "1000:460")</label>
+            <label index="tt_content.tx_rtpimgquery_pixel_ratios">Device pixel ratios (comma separated list)</label>
             <label index="palette.breakpoints">Breakpoints</label>
         </languageKey>
     </data>

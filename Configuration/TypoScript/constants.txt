@@ -16,4 +16,7 @@ styles.content.breakpoints =
 
 // Default device pixel ratios used to generate additional images with equivalent resolutions for
 // retina enabled devices
-styles.content.pixelRatios = 1.5, 2
+styles.content.breakpoints.pixelRatios =
+
+// Enable/disable debugging
+styles.content.breakpoints.debug =

@@ -1,22 +1,22 @@
 <?php
 namespace RTP\RtpImgquery\Xclass;
 
-use \TYPO3\CMS\Frontend\ContentObject\ImageContentObject as ImageContentObject;
 use \TYPO3\CMS\Core\Utility\GeneralUtility as GeneralUtility;
+use \RTP\RtpImgquery\Configuration\Cache as Cache;
 
-    /* ============================================================================
-     *
-     * This script is part of the rtp_imgquery extension ("responsive
-     * images for TYPO3") for the TYPO3 project.
-     *
-     * It is free software; you can redistribute it and/or modify it under
-     * the terms of the GNU General Public License, either version 3 of the
-     * License, or (at your option) any later version.
-     *
-     * Copyright 2012 Simon Tuck <stu@rtp.ch>
-     *
-     * ============================================================================
-     */
+/* ============================================================================
+ *
+ * This script is part of the rtp_imgquery extension ("responsive
+ * images for TYPO3") for the TYPO3 project.
+ *
+ * It is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Copyright 2012 Simon Tuck <stu@rtp.ch>
+ *
+ * ============================================================================
+ */
 
 /**
  * Extends the TypoScript IMAGE object to accommodate responsive and
@@ -33,6 +33,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility as GeneralUtility;
  *      breakpoint = 1200
  *      breakpoints = 600:400,400:280,320:160
  *      breakpoints.320.file.height = 90
+ *      breakpoints.pixelRatios = 1,1.5,2
  *  }
  *
  * Smarty example:
@@ -44,20 +45,21 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility as GeneralUtility;
  *      breakpoint = 1200
  *      breakpoints = 600:400,400:280,320:160
  *      breakpoints.320.file.height = 90
+ *      breakpoints.pixelRatios = 1,1.5,2
  *  }
  *
  * @author  Simon Tuck <stu@rtp.ch>
  * @link https://github.com/rtp-ch/rtp_imgquery
  * @todo: Refactor & merge with view helper methods.
  */
-class ImageQueryContentObject extends ImageContentObject
+class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentObject
 {
     /**
      * Registry retains information about generated images
      *
      * @var null
      */
-    private $registry;
+    private $cache;
 
     /**
      * Default layout
@@ -79,6 +81,11 @@ class ImageQueryContentObject extends ImageContentObject
      * @var array
      */
     private $layoutContent;
+
+    /**
+     * @var
+     */
+    private $defaultImage;
 
     /**
      * TypoScript configuration
@@ -110,12 +117,14 @@ class ImageQueryContentObject extends ImageContentObject
         // Initialize the IMAGE object. Note that "tslib_content_Image" is implemented as a singleton
         // so a variable ($registry) and a unique id are used to store the details of individual IMAGE objects.
         $this->conf = $conf;
-        $this->id = $this->id($conf);
+        $this->defaultImage = $this->cObj->cImage($this->conf['file'], $this->conf);
+        $cacheIdentity = array($this->defaultImage, $conf);
+        $this->cache = GeneralUtility::makeInstance('RTP\RtpImgquery\Configuration\Cache', $cacheIdentity);
 
         if ($this->cObj->checkif($conf['if.'])) {
 
             if ($this->hasDebug()) {
-                t3lib_utility_Debug::debugInPopUpWindow(
+                \t3lib_utility_Debug::debug(
                     array(
                         '================' => '================',
                         'conf' => $this->conf,
@@ -133,9 +142,8 @@ class ImageQueryContentObject extends ImageContentObject
                 $imageHtml = $this->responsiveImage();
 
                 if ($this->hasDebug()) {
-                    t3lib_utility_Debug::debugInPopUpWindow(
+                    \t3lib_utility_Debug::debug(
                         array(
-                            'id' => $this->id,
                             'defaultImage' => $this->defaultImage(),
                             'defaultWidth' => $this->defaultWidth(),
                             'breakpoints' => $this->breakpoints(),
@@ -157,7 +165,7 @@ class ImageQueryContentObject extends ImageContentObject
             }
 
             if ($this->hasDebug()) {
-                t3lib_utility_Debug::debugInPopUpWindow(
+                \t3lib_utility_Debug::debug(
                     array(
                         'imageHtml' => $imageHtml,
                         '================' => '================',
@@ -183,7 +191,7 @@ class ImageQueryContentObject extends ImageContentObject
     private function responsiveImage()
     {
         if (count($this->breakpoints()) > 1) {
-            $search  = array_keys($this->markers());
+            $search = array_keys($this->markers());
             $replace = $this->markers();
             $content = $this->layoutContent();
             $responsiveImage = html_entity_decode(str_ireplace($search, $replace, $content));
@@ -202,15 +210,44 @@ class ImageQueryContentObject extends ImageContentObject
      */
 
     /**
+     * Implements inline style for a given HTML img tag.
+     *
+     * @param $image
+     * @return mixed
+     */
+    private function insertStyle($image)
+    {
+        // If set, handle inline style to make the image fluid (i.e. width/height 100%)
+        if ($this->hasStyle()) {
+
+            if (preg_match('%<img[^>]+style\s*=\s*"[^"]+"[^>]*/?>%i', $image)) {
+                // Augment an existing inline style
+                $search = '%<img([^>]+)style\s*=\s*"([^"]+)"([^>]*)(/?>)%i';
+                $replace = '<img$1style="$2;' . $this->getStyle() . '"$3$4';
+                $image = preg_replace($search, $replace, $image);
+
+            } else {
+
+                // Or insert new inline style
+                $image = preg_replace('%<img([^>]+)(/?>)%i', '<img style="' . $this->getStyle() . '"$1$2', $image);
+            }
+        }
+
+        return $image;
+    }
+
+    /**
      * Gets the style attached to responsive images (the image dimensions should be fluid
      * until it hits the next breakpoint).
      *
      * @return string
      */
-    private function style()
+    private function getStyle()
     {
-        if (!isset($this->registry[$this->id]['style'])) {
-            if (isset($this->conf['breakpoints.']['style'])) {
+
+        if (!$this->cache->has('style')) {
+
+            if (isset($this->conf['breakpoints.']['style']) && (boolean)$this->conf['breakpoints.']['style']) {
                 $style = $this->conf['breakpoints.']['style'];
 
             } else {
@@ -222,33 +259,43 @@ class ImageQueryContentObject extends ImageContentObject
                 $style .= ';';
             }
 
-            $this->registry[$this->id]['style'] = $style;
+            $this->cache->set('style', $style);
         }
 
-        return $this->registry[$this->id]['style'];
+        return $this->cache->get('style', $style);
     }
 
     /**
-     * Checks if default inline styles should be set
+     * Checks if default inline styles should be applied
      *
      * @return bool
      */
     private function hasStyle()
     {
-        static $hasInlineStyle;
+        $hasStyle = false;
 
-        if (is_null($hasInlineStyle)) {
+        if ($this->hasBreakpoints()) {
 
-            $hasInlineStyle = true;
+            $style = trim($this->conf['breakpoints.']['style']);
 
-            if (isset($this->conf['breakpoints.']['style']) && $this->conf['breakpoints.']['style']) {
-                if (preg_match("/^(off|false|no|none|0)$/i", trim($this->conf['breakpoints.']['style']))) {
-                    $hasInlineStyle = false;
+            if ((boolean)$style) {
+
+                // If a style has been set and that style is falsey value then fluid image style is disabled
+                if (preg_match("/^(off|false|no|none|0)$/i", $style)) {
+                    $hasStyle = false;
+
+                } else {
+                    $hasStyle = true;
                 }
+
+            } else {
+                // If no style has been set check the default behaviour
+                $extConf = (array)unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['rtp_imgquery']);
+                $hasStyle = (boolean)$extConf['enableFluidImages'] ? true : false;
             }
         }
 
-        return $hasInlineStyle;
+        return $hasStyle;
     }
 
     /*
@@ -258,37 +305,22 @@ class ImageQueryContentObject extends ImageContentObject
      */
 
     /**
-     * Gets the image tag of the main IMAGE object (i.e. the default image).
+     * * Gets the img HTML for the default image.
      *
      * @return string
      */
     private function defaultImage()
     {
-        if (!isset($this->registry[$this->id]['defaultImage'])) {
-            $this->registry[$this->id]['defaultImage'] = $this->cObj->cImage($this->conf['file'], $this->conf);
+        if (!$this->cache->has('defaultImage')) {
+
+            $defaultImage = $this->cObj->cImage($this->conf['file'], $this->conf);
+            $defaultImage = $this->insertStyle($defaultImage);
+            $this->cache->set('defaultImage', $defaultImage);
         }
 
-        return $this->registry[$this->id]['defaultImage'];
+        return $this->cache->get('defaultImage');
     }
 
-    /**
-     * Retrieves the image tag for a given breakpoint.
-     *
-     * @param $breakpoint
-     * @return null
-     */
-    private function image($breakpoint)
-    {
-        $images = $this->images();
-        if (is_string($images[$breakpoint])) {
-            $image = $images[$breakpoint];
-
-        } else {
-            $image = null;
-        }
-
-        return $image;
-    }
 
     /**
      * Creates the images for all breakpoints and returns a list of final image tags per breakpoint.
@@ -297,48 +329,42 @@ class ImageQueryContentObject extends ImageContentObject
      */
     private function images()
     {
-        if (!isset($this->registry[$this->id]['images'])) {
+        if (!$this->cache->has('images')) {
 
-            $this->registry[$this->id]['images'] = array();
+            $images = array();
 
+            // Generates images according to their implied configurations by device pixel ratio and breakpoint
             if ($this->hasBreakpoints()) {
-                foreach ($this->breakpoints() as $breakpoint) {
-
-                    foreach ($this->pixelRatios() as $pixelRatio) {
+                foreach ($this->pixelRatios() as $pixelRatio) {
+                    foreach ($this->breakpoints() as $breakpoint) {
 
                         // Get the implied typoscript configuration for the breakpoint
                         $impliedConfiguration = $this->impliedConfiguration($breakpoint);
 
-                        // TODO: Adjust height/width
+                        if ($pixelRatio > 1) {
+                            $standardWidth = $impliedConfiguration['file.']['width'];
+                            $impliedConfiguration['file.']['width'] = $pixelRatio * $standardWidth;
+
+                            $standardHeight = $impliedConfiguration['file.']['height'];
+                            $impliedConfiguration['file.']['height'] = $pixelRatio * $standardHeight;
+                        }
 
                         // Generate the corresponding image with the implied typoscript configuration
                         $image = $this->cObj->cImage($impliedConfiguration['file'], $impliedConfiguration);
 
-                        // If set, handle inline style to make the image fluid (i.e. width/height 100%)
-                        if ($this->hasStyle()) {
-                            if (preg_match('/style\s*=\s*"([^"]+)"/i', $image)) {
-                                // Insert into existing inline style
-                                $image = preg_replace(
-                                    '%style\s*=\s*"([^"]+)"%i',
-                                    ' style="' . $this->style() . ' \1"',
-                                    $image
-                                );
+                        // Implements inline styles
+                        $image = $this->insertStyle($image);
 
-                            } else {
-                                // Or insert new inline style
-                                $image = preg_replace('%(\s*/?>$)%im', ' style="' . $this->style() . '"\1', $image);
-                            }
-                        }
-
-                        // Cache the result
-                        $this->registry[$this->id]['images'][$pixelRatio][$breakpoint] = $image;
+                        //
+                        $images[strval($pixelRatio)][strval($breakpoint)] = $image;
                     }
                 }
             }
+
+            $this->cache->set('images', $images);
         }
 
-        // Return the array of breakpoints/image versions for the current image
-        return $this->registry[$this->id]['images'];
+        return $this->cache->get('images');
     }
 
     /*
@@ -354,18 +380,20 @@ class ImageQueryContentObject extends ImageContentObject
      */
     private function hasDebug()
     {
-        return (boolean) $this->conf['breakpoints.']['debug'];
-    }
+        if (!$this->cache->has('debug')) {
 
-    /**
-     * Instance id: a unique Id for each IMAGE object.
-     *
-     * @param $conf
-     * @return string
-     */
-    private function id($conf)
-    {
-        return md5(serialize($conf), true);
+            $hasDebug = false;
+
+            if (isset($this->conf['breakpoints.']['debug']) && (boolean)$this->conf['breakpoints.']['debug']) {
+                if (preg_match("/^(on|true|yes|1)$/i", trim($this->conf['breakpoints.']['debug']))) {
+                    $hasDebug = true;
+                }
+            }
+
+            $this->cache->set('debug', $hasDebug);
+        }
+
+        return $this->cache->get('debug');
     }
 
     /**
@@ -389,8 +417,10 @@ class ImageQueryContentObject extends ImageContentObject
     }
 
     /**
-     * Creates and returns a list (sorted in descending order) of breakpoints and their corresponding
-     * TypoScript IMAGE configurations.
+     * Creates and returns a list (sorted in ascending order) of breakpoints and their complete
+     * TypoScript IMAGE configurations. These configurations are implied by th configuration of the
+     * default image, (i.e. $this->conf without any of the "breakpoint/breakpoints" settings) and their
+     * implied measurements.
      *
      * @return array
      */
@@ -398,45 +428,44 @@ class ImageQueryContentObject extends ImageContentObject
     {
         // Creates the TypoScript configuration for each breakpoint image from the TypoScript configuration
         // of the default image and any breakpoint TypoScript configuration.
-        if (!isset($this->registry[$this->id]['impliedConfigurations'])) {
+        if (!$this->cache->has('impliedConfigurations')) {
 
-            $this->registry[$this->id]['impliedConfigurations'] = array();
+            $impliedConfigurations = array();
 
             if ($this->hasBreakpoints()) {
                 foreach ($this->breakpoints() as $breakpoint) {
 
-                    // Copies the TypoScript configuration of the main IMAGE object to the breakpoint image.
+                    // Copies default IMAGE TypoScript to each breakpoint.
                     $impliedConfigurations[$breakpoint] = $this->conf;
 
-                    // Copies default image TypoScript to each breakpoint (except for the default breakpoint), adjusts
-                    // width and height of the breakpoint image version accordingly and applies any breakpoint specific
-                    // TypoScript configuration (e.g. breakpoints.x.file.width = n).
-                    if ($breakpoint !== $this->defaultBreakpoint()) {
+                    // Modifies image dimensions for all images (including the default)
+                    $impliedConfigurations[$breakpoint] =
+                        GeneralUtility::array_merge_recursive_overrule(
+                            $impliedConfigurations[$breakpoint],
+                            $this->impliedMeasurement($breakpoint)
+                        );
 
-                        // The default settings are overridden by individual breakpoint TypoScript configurations
-                        if ($this->hasBreakpointConfiguration($breakpoint)) {
-                            $impliedConfigurations[$breakpoint] =
-                                GeneralUtility::array_merge_recursive_overrule(
-                                    $impliedConfigurations[$breakpoint],
-                                    $this->breakpointConfiguration($breakpoint)
-                                );
-                        }
-                    }
+                    // Unset and additional dimension settings which could disrupt the implied measurements
+                    unset($impliedConfigurations[$breakpoint]['file.']['maxW']);
+                    unset($impliedConfigurations[$breakpoint]['file.']['maxH']);
+                    unset($impliedConfigurations[$breakpoint]['file.']['minW']);
+                    unset($impliedConfigurations[$breakpoint]['file.']['minH']);
+                    unset($impliedConfigurations[$breakpoint]['file.']['width.']);
+                    unset($impliedConfigurations[$breakpoint]['file.']['height.']);
 
-                    // Unsets misc. superfluous TypoScript configuration (i.e. breakpoint information
-                    // which has been copied to each image)
+                    // Unsets the "breakpoint/breakpoints" settings.
                     unset($impliedConfigurations[$breakpoint]['file.']['breakpoint']);
                     unset($impliedConfigurations[$breakpoint]['breakpoints']);
                     unset($impliedConfigurations[$breakpoint]['breakpoints.']);
                 }
 
-                // Sorts list of image settings descending by breakpoint
-                krsort($impliedConfigurations);
-                $this->registry[$this->id]['impliedConfigurations'] = $impliedConfigurations;
+                // Sorts list of image settings in ascending order by breakpoint
+                ksort($impliedConfigurations);
+                $this->cache->set('impliedConfigurations', $impliedConfigurations);
             }
         }
 
-        return $this->registry[$this->id]['impliedConfigurations'];
+        return $this->cache->get('impliedConfigurations');
     }
 
 
@@ -447,48 +476,50 @@ class ImageQueryContentObject extends ImageContentObject
      */
 
     /**
-     * Modifies the default image height based on the default width and the given breakpoint.
+     * Calculates the height for a given width based on the ratio between the default width and height
      *
      * @param string $width
-     * @return string
+     * @return int|string
      */
-    private function modifiedHeight($width)
+    public function modifiedHeight($width)
     {
         $height = floor(intval($width) / intval($this->defaultWidth()) * intval($this->defaultHeight()));
         return preg_replace('/\d+/', $height, $this->defaultHeight());
     }
 
     /**
-     * Gets the height of the default image from file.height taking stdWrap into account
+     * Gets the height of the default image from file.height of from the img HTML of the default image
      *
      * @return null
      */
     private function defaultHeight()
     {
-        if (!isset($this->registry[$this->id]['defaultHeight'])) {
+        if (!$this->cache->has('defaultHeight')) {
 
             $defaultHeight = false;
 
             if (isset($this->conf['file.']['height'])) {
+                // If set process the configuration in file.height
                 $defaultHeight = $this->cObj->stdWrap($this->conf['file.']['height'], $this->conf['file.']['height.']);
 
             } elseif (preg_match('/height\s*=\s*"([^"]+)"/i', $this->defaultImage(), $match)) {
-                // Avoid values which are not numeric, e.g. percentages
+                // Otherwise retreives the default height directly from the default image (unless the image
+                // height is defined as a percentage.
                 if (is_numeric($match[1])) {
                     $defaultHeight = $match[1];
                 }
                 // TODO: Get image dimensions from $this->defaultSource(). see view helper functionality
             }
 
-            $this->registry[$this->id]['defaultHeight'] = $defaultHeight;
+            $this->cache->set('defaultHeight', $defaultHeight);
         }
 
-        return $this->registry[$this->id]['defaultHeight'];
+        return $this->cache->get('defaultHeight');
     }
 
     /**
-     * Modifies the default image width to match the given breakpoint. Takes into account special
-     * settings such as "c" and "m" (i.e. cropping and scaling parameters).
+     * Calculates the image width for a given breakpoint based on it's ratio to the default breakpoint.
+     * Takes into account special settings such as "c" and "m" (i.e. cropping and scaling parameters).
      *
      * @param $breakpoint
      * @return string
@@ -500,13 +531,13 @@ class ImageQueryContentObject extends ImageContentObject
     }
 
     /**
-     * Gets the width of the default image from file.width taking stdWrap into account
+     * Gets the height of the default image from file.width of from the img HTML of the default image
      *
-     * @return string
+     * @return int|string
      */
     private function defaultWidth()
     {
-        if (!isset($this->registry[$this->id]['defaultWidth'])) {
+        if (!$this->cache->has('defaultWidth')) {
 
             $defaultWidth = false;
 
@@ -521,10 +552,10 @@ class ImageQueryContentObject extends ImageContentObject
                 // TODO: Get image dimensions from $this->defaultSource()? see view helper functionality
             }
 
-            $this->registry[$this->id]['defaultWidth'] = $defaultWidth;
+            $this->cache->set('defaultWidth', $defaultWidth);
         }
 
-        return $this->registry[$this->id]['defaultWidth'];
+        return $this->cache->get('defaultWidth');
     }
 
     /*
@@ -534,60 +565,37 @@ class ImageQueryContentObject extends ImageContentObject
      */
 
     /**
-     * Determines if the given breakpoint has TypoScript configuration options.
-     *
-     * @param $breakpoint
-     * @return bool
-     */
-    private function hasBreakpointConfiguration($breakpoint)
-    {
-        return (boolean)$this->breakpointConfigurations() && $this->breakpointConfiguration($breakpoint);
-    }
-
-    /**
-     * Determines if any of the defined breakpoints have configured TypoScript, e.g.
-     * breakpoints.x.foo = bar where foo is TypoScript configuration for breakpoint x.
-     *
-     * @return bool
-     */
-    private function hasBreakpointConfigurations()
-    {
-        return (boolean)$this->breakpointConfigurations();
-    }
-
-    /**
-     * Gets the configured TypoScript for a given breakpoint. For example, retrieves TypoScript for
-     * a given breakpoint x from breakpoints.x.foo = bar (foo = bar).
+     * Gets the implied width/height for a given breakpoint.
      *
      *
      * @param $breakpoint
      * @return array
      */
-    private function breakpointConfiguration($breakpoint)
+    private function impliedMeasurement($breakpoint)
     {
-        $breakpointConfigurations = $this->breakpointConfigurations();
+        $measurements = $this->impliedMeasurements();
+        $measurement = array();
 
-        if (is_array($breakpointConfigurations[$breakpoint]) && !empty($breakpointConfigurations[$breakpoint])) {
-            $breakpointConfiguration = $breakpointConfigurations[$breakpoint];
-
-        } else {
-            $breakpointConfiguration = null;
+        if (is_array($measurements[$breakpoint]) && !empty($measurements[$breakpoint])) {
+            $measurement = $measurements[$breakpoint];
         }
 
-        return $breakpointConfiguration;
+        return $measurement;
     }
 
     /**
-     * Gets the configured TypoScript for all breakpoints (breakpoints.[...]).
+     * Constructs the width/height for each of the breakpoints. In most cases this is just a matter of
+     * modifying the dimensions of the main image. However, more detailed configuration options are possible
+     * and are taken into account.
      *
      * @return array
      */
-    private function breakpointConfigurations()
+    private function impliedMeasurements()
     {
-        if (!isset($this->registry[$this->id]['breakpointConfigurations'])) {
+        if (!$this->cache->has('impliedMeasurements')) {
+            $impliedMeasurements = array();
 
-            $breakpointConfigurations = array();
-
+            // Gets the configuration either from the content element or TypoScript configuration
             if ($this->cObj->data['tx_rtpimgquery_breakpoints']) {
                 $settings = $this->cObj->data['tx_rtpimgquery_breakpoints'];
 
@@ -595,75 +603,76 @@ class ImageQueryContentObject extends ImageContentObject
                 $settings = $this->conf['breakpoints'];
             }
 
+            // Iterates through all defined breakpoints and constructs their configuration settings
             foreach ($this->breakpoints() as $breakpoint) {
 
-                if ($breakpoint !== $this->defaultBreakpoint()) {
-
-                    // Regex matches settings like 800:500 where 500 would be a configured image width
-                    // for the breakpoint 800
-                    if ($settings && preg_match('/' . $breakpoint . ':(\w+)/i', $settings, $width)) {
-                        $breakpointConfigurations[$breakpoint]['file.']['width'] = $width[1];
-                    } else {
-                        $width = $this->modifiedWidth($breakpoint);
-                        $breakpointConfigurations[$breakpoint]['file.']['width'] = $width;
-                    }
-
-                    if (isset($this->conf['breakpoints.'][$breakpoint . '.'])) {
-                        $breakpointConfigurations[$breakpoint]['file.'] =
-                            t3lib_div::array_merge_recursive_overrule(
-                                (array)$breakpointConfigurations[$breakpoint]['file.'],
-                                (array)$this->conf['breakpoints.'][$breakpoint . '.']['file.']
-                            );
-                    }
-
-                    // Gets the new height
-                    $breakpointConfigurations[$breakpoint]['file.']['height'] =
-                        $this->cObj->stdWrap(
-                            $breakpointConfigurations[$breakpoint]['file.']['height'],
-                            $breakpointConfigurations[$breakpoint]['file.']['height.']
-                        );
-
-                    // If no height was defined, gets the height from the new width
-                    if (!$breakpointConfigurations[$breakpoint]['file.']['height']) {
-                        $breakpointConfigurations[$breakpoint]['file.']['height'] =
-                            $this->modifiedHeight($breakpointConfigurations[$breakpoint]['file.']['width']);
-                    }
+                if ($settings && preg_match('/' . $breakpoint . ':(\w+)/i', $settings, $width)) {
+                    // Matches settings like 800:500 where 500 would be the image width for the breakpoint 800
+                    $width = $width[1];
 
                 } else {
-                    // TODO: or not...?
-                    //$breakpointConfigurations[$breakpoint]['file.']['width'] = $this->defaultWidth();
+                    // Gets the implied image width from the breakpoint if no width was defined
+                    $width = $this->modifiedWidth($breakpoint);
+                }
+
+                // Sets file.width for the current breakpoint
+                $impliedMeasurements[$breakpoint]['file.']['width'] = $width;
+
+                // Merges in any other configurations for the breakpoint (e.g. breakpoints.500.x)
+                if (isset($this->conf['breakpoints.'][$breakpoint . '.'])) {
+                    $impliedMeasurements[$breakpoint]['file.'] =
+                        GeneralUtility::array_merge_recursive_overrule(
+                            (array)$impliedMeasurements[$breakpoint]['file.'],
+                            (array)$this->conf['breakpoints.'][$breakpoint . '.']['file.']
+                        );
+                }
+
+                // Processes any image height configurations
+                $impliedMeasurements[$breakpoint]['file.']['height'] =
+                    $this->cObj->stdWrap(
+                        $impliedMeasurements[$breakpoint]['file.']['height'],
+                        $impliedMeasurements[$breakpoint]['file.']['height.']
+                    );
+
+                // Gets the implied height from the width for the current breakpoint if no height was defined.
+                if (!$impliedMeasurements[$breakpoint]['file.']['height']) {
+                    $impliedMeasurements[$breakpoint]['file.']['height'] =
+                        $this->modifiedHeight($impliedMeasurements[$breakpoint]['file.']['width']);
                 }
             }
 
-            $this->registry[$this->id]['breakpointConfigurations'] = $breakpointConfigurations;
+            $this->cache->set('impliedMeasurements', $impliedMeasurements);
         }
 
-        return $this->registry[$this->id]['breakpointConfigurations'];
+        return $this->cache->get('impliedMeasurements');
     }
 
     /**
-     * Gets the default breakpoint either as configured in file.breakpoint or from the width
-     * of the default image
+     * Gets the default breakpoint from any of the following sources (in order of priority);
+     * - As configured in the content element
+     * - As configured in TypoScript
+     * - The width of the default image.
      *
      * @return int
      */
     private function defaultBreakpoint()
     {
-        if (!isset($this->registry[$this->id]['defaultBreakpoint'])) {
+        if (!$this->cache->has('defaultBreakpoint')) {
 
             if ($this->cObj->data['tx_rtpimgquery_breakpoint']) {
-                $this->registry[$this->id]['defaultBreakpoint']
-                    = intval($this->cObj->data['tx_rtpimgquery_breakpoint']);
+                $defaultBreakpoint = intval($this->cObj->data['tx_rtpimgquery_breakpoint']);
 
             } elseif ($this->conf['breakpoint']) {
-                $this->registry[$this->id]['defaultBreakpoint'] = intval($this->conf['breakpoint']);
+                $defaultBreakpoint = intval($this->conf['breakpoint']);
 
             } else {
-                $this->registry[$this->id]['defaultBreakpoint'] = intval($this->defaultWidth());
+                $defaultBreakpoint = intval($this->defaultWidth());
             }
+
+            $this->cache->set('defaultBreakpoint', $defaultBreakpoint);
         }
 
-        return $this->registry[$this->id]['defaultBreakpoint'];
+        return $this->cache->get('defaultBreakpoint');
     }
 
     /**
@@ -673,86 +682,80 @@ class ImageQueryContentObject extends ImageContentObject
      */
     private function hasBreakpoints()
     {
-        return (boolean) $this->breakpoints();
+        return (boolean)$this->breakpoints();
     }
 
 
     /**
-     * Gets the list of defined breakpoints sorted in descending order and including the default breakpoint (i.e. the
-     * breakpoint for the default image).
+     * Gets the list of defined breakpoints from the configuration sorted in descending order and
+     * including the default breakpoint (i.e. the breakpoint for the default image).
+     *
      *
      * @return array
      */
     private function breakpoints()
     {
 
-        if (!isset($this->registry[$this->id]['breakpoints'])) {
+        if (!$this->cache->has('breakpoints')) {
 
             $breakpoints = array();
 
             // The simplest case is that breakpoints are configured as "breakpoints = x, y, z" where
-            // x, y & z are the breakpoints and the corresponding image widths. Alternatively the breakpoints can
-            // be configure as "breakpoints = x:a, y:b, z:c" where x, y & z are the breakpoints and a, b, c
-            // are the image widths.
+            // x, y & z are the breakpoints and the breakpoints correspond exactly to the image widths. e.g.
+            // 400, 600, 1000 would define image widths 400, 600 & 1000 for browser widths 400, 600 & 1000
+            // Alternatively the breakpoints can be configure as "breakpoints = x:a, y:b, z:c"
+            // where x, y & z are the breakpoints and a, b, c are the image widths. So 400:600 would define an
+            // image width of 600 at breakpoint 400.
             if (isset($this->conf['breakpoints']) || $this->cObj->data['tx_rtpimgquery_breakpoints']) {
+
                 if ($this->cObj->data['tx_rtpimgquery_breakpoints']) {
                     $breakpoints = str_replace(chr(10), ',', $this->cObj->data['tx_rtpimgquery_breakpoints']);
+
                 } else {
                     $breakpoints = $this->conf['breakpoints'];
                 }
+
+                // Create an array of breakpoints
                 $breakpoints = GeneralUtility::trimExplode(',', $breakpoints, true);
 
-                // Converts something like 610:400 to 610
+                // Converts something like 610:400 to 610 (we are not interested in image widths)
                 $breakpoints = array_filter(array_map('intval', $breakpoints));
             }
 
-            // A more detailed configuration is breakpoints.x.file.width = n where x is the breakpoint
-            // (i.e. viewport width) and n is the corresponding image width.
+            // In addition to or instead of the configuration outlined above, breakpoints can be configured in more
+            // detail as "breakpoints.x.file.width = n" where x is the breakpoint n is the corresponding image width.
             if (is_array($this->conf['breakpoints.'])) {
+
                 $configuredBreakpoints = array_filter(array_map('intval', array_keys($this->conf['breakpoints.'])));
+
                 if (is_array($configuredBreakpoints) && !empty($configuredBreakpoints)) {
-                    $breakpoints = array_merge($breakpoints, $configuredBreakpoints);
+                    $breakpoints = array_merge((array)$breakpoints, $configuredBreakpoints);
                 }
             }
 
-            // If breakpoints have been defined or if a breakpoint has explicitly been set for the default image (i.e.
-            // it's possible to define an image which has a breakpoint, but no alternative images!):
-            // Adds the breakpoint of the default image from file.breakpoint = x (if undefined the breakpoint is
-            // assumed to be the width of the default image). Also sorts the list of breakpoints in descending order.
-            // TODO: Does this make sense? could be used to implement breakpoint behaviour with just 1 image...
-            if (!empty($breakpoints) ||
-                isset($this->conf['file.']['breakpoint']) ||
-                $this->cObj->data['tx_rtpimgquery_breakpoints']
-            ) {
-
+            // Adds the default breakpoint to the list, but only if the list contains other breakpoints (an
+            // image configuration with a single breakpoint makes no sense!)
+            if (!empty($breakpoints)) {
                 $breakpoints[] = $this->defaultBreakpoint();
-                $breakpoints = array_map('intval', array_unique($breakpoints));
-                rsort($breakpoints, SORT_NUMERIC);
             }
 
-            $this->registry[$this->id]['breakpoints'] = $breakpoints;
+            // Cleans up and sorts the final list of breakpoints
+            $breakpoints = array_map('intval', array_unique($breakpoints));
+            sort($breakpoints, SORT_NUMERIC);
+
+            // Caches the breakpoints for the current configuration
+            $this->cache->set('breakpoints', $breakpoints);
         }
 
-        return $this->registry[$this->id]['breakpoints'];
+        // Returns the list of breakpoints
+        return $this->cache->get('breakpoints');
     }
-
 
     /*
      * =======================================================
      * Retina Images
      * =======================================================
      */
-
-
-    /**
-     * Checks if the retina image feature is enabled.
-     *
-     * @return bool
-     */
-    private function hasPixelRatios()
-    {
-        return (boolean) $this->conf['enablePixelRatios'];
-    }
 
     /**
      * Returns an array of configured retina ratios to be used for image generation.
@@ -761,25 +764,26 @@ class ImageQueryContentObject extends ImageContentObject
      */
     private function pixelRatios()
     {
-        $pixelRatios = array();
-
-        if ($this->hasPixelRatios()) {
+        if (!$this->cache->has('pixelRatios')) {
 
             if ($this->cObj->data['tx_rtpimgquery_pixel_ratios']) {
                 $pixelRatios = GeneralUtility::trimExplode(',', $this->cObj->data['tx_rtpimgquery_pixel_ratios'], true);
 
             } else {
-                $pixelRatios = GeneralUtility::trimExplode(',', $this->conf['pixelRatios'], true);
+                $pixelRatios = GeneralUtility::trimExplode(',', $this->conf['breakpoints.']['pixelRatios'], true);
             }
+
+            // The default device resolution is 1
+            array_unshift($pixelRatios, 1);
+
+            // Caches a list of unique values
+            $pixelRatios = array_unique(array_map('floatval', $pixelRatios));
+            sort($pixelRatios);
+            $this->cache->set('pixelRatios', $pixelRatios);
         }
 
-        // The default device resolution is 1
-        array_unshift($pixelRatios, 1);
-
-        // Returns a list of unique values
-        return array_unique(array_map('floatval', $pixelRatios));
+        return $this->cache->get('pixelRatios');
     }
-
 
     /*
      * ========================================================
@@ -835,10 +839,10 @@ class ImageQueryContentObject extends ImageContentObject
     {
         if (is_null($this->registry[$this->id]['markers'])) {
             $this->registry[$this->id]['markers'] = array(
-                '###DEFAULT_IMAGE###' => $this->image($this->defaultBreakpoint()),
+                '###DEFAULT_IMAGE###' => $this->defaultImage(),
                 '###BREAKPOINTS###' => json_encode($this->breakpoints()),
                 '###IMAGES###' => json_encode($this->images()),
-                '###RATIOS###' => json_encode($this->ratios()),
+                '###RATIOS###' => json_encode($this->pixelRatios()),
             );
         }
 

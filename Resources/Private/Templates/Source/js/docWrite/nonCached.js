@@ -47,12 +47,6 @@
         return i;
     },
 
-    sort: function (a, b) {
-        'use strict';
-
-        return (a < b ? -1 : (b > a ? 1 : 0));
-    },
-
     /**
      * Determines the correct image from the current window size, a list of images, a corresponding
      * list of breakpoints and a list of pixel ratios. The "correct" image is inserted into the dom and cached.
@@ -65,58 +59,13 @@
     imgQry: function (global, breakpoints, images, ratios) {
         'use strict';
 
-        breakpoints = breakpoints.sort(this.sort);
-        ratios = ratios.sort(this.sort);
+        var pixelRatio = (typeof(global.devicePixelRatio) !== 'undefined') ? global.devicePixelRatio : 1,
+            ratio = ratios[this.closest(ratios.sort(this.sort), pixelRatio)],
+            width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || 0;
 
-        // Cache key for the current images/breakpoints combo.
-        var key = Array.prototype.slice.call(arguments, 1);
+        breakpoints = breakpoints.sort(function (a, b) {return (a < b ? -1 : (b > a ? 1 : 0))});
 
-        // Initializes global cache
-        if (typeof global.imgQry === 'undefined') {
-            global.imgQry = {};
-        }
-
-        // Initializes global images cache
-        if (typeof global.images === 'undefined') {
-            global.imgQry.images = {};
-        }
-
-        // Initializes global ratios cache
-        if (typeof global.ratios === 'undefined') {
-            global.imgQry.ratios = {};
-        }
-
-        // Initializes global breakpoints cache
-        if (typeof global.breakpoints === 'undefined') {
-            global.imgQry.breakpoints = {};
-        }
-
-        // Caches the initial window width
-        if (typeof global.imgQry.width === 'undefined') {
-            global.imgQry.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || 0;
-        }
-
-        // Caches the initial pixel ratio
-        if (typeof global.imgQry.ratio === 'undefined') {
-            global.imgQry.ratio = (typeof(global.devicePixelRatio) !== 'undefined') ? global.devicePixelRatio : 1;
-        }
-
-        // Caches the correct pixel ratio for the current device and ratios
-        if (typeof global.imgQry.ratios[ratios] === 'undefined') {
-            global.imgQry.ratios[ratios] = ratios[this.closest(ratios, global.imgQry.ratio)];
-        }
-
-        // Caches the correct breakpoint for the current window width and breakpoints
-        if (typeof global.imgQry.breakpoints[breakpoints] === 'undefined') {
-            global.imgQry.breakpoints[breakpoints] = breakpoints[this.closest(breakpoints, global.imgQry.width)];
-        }
-
-        // Gets the proper image for the current breakpoint and pixel ratio
-        if (typeof global.imgQry.images[key] === 'undefined') {
-            global.imgQry.images[key] = images[global.imgQry.ratios[ratios]][global.imgQry.breakpoints[breakpoints]];
-        }
-
-        this.write(global.imgQry.images[key]);
+        this.write(images[ratio][breakpoints[this.closest(breakpoints, width)]]);
     }
 // Do not change the naming of the arguments as these will be regexed when building the TYPO3 template!
 }.imgQry(this, breakpointsIn, imagesIn, ratiosIn));

@@ -21,14 +21,18 @@ use \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper as ImageViewHelper;
  *
  * Example:
  * {namespace responsive=Tx_RtpImgquery_ViewHelpers}
- * <responsive:image src="EXT:myext/Resources/Public/typo3_logo.png" alt="alt text" breakpoint="900" breakpoints="600:300, 400" pixelRatios="1,1.5,2" />
+ * <responsive:image src="EXT:myext/Resources/Public/typo3_logo.png"
+ *                   alt="alt text"
+ *                   breakpoint="900"
+ *                   breakpoints="600:300, 400"
+ *                   pixelRatios="1,1.5,2" />
  *
  *
  * @author  Simon Tuck <stu@rtp.ch>
  * @link https://github.com/rtp-ch/rtp_imgquery
  * @todo: Refactor & merge with IMAGE xclass methods.
  */
-class Tx_RtpImgquery_ViewHelpers extends ImageViewHelper
+class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_ImageViewHelper
 {
     /**
      * @var string
@@ -640,3 +644,4 @@ class Tx_RtpImgquery_ViewHelpers extends ImageViewHelper
         return $this->markers;
     }
 }
+

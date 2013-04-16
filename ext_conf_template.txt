@@ -1,0 +1,3 @@
+
+# cat=basic/enable; type=boolean; label=Enable fluid images: If enabled images will have have CSS setting width and height to 100%, thus making their sizing "fluid". This was the default behaviour in 1.x versions of the extension. Disabling this feature will prevent the extension from **automatically** inlining fluid image styles – you can however still set inline styles by setting breakpoints.style on a case by case basis or globally.
+enableFluidImages = 1

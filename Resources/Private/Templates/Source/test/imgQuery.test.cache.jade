@@ -2,21 +2,23 @@ extends imgQuery
 
 block test
     script(type='text/javascript')
-        // Deliberatly without var so that imagesIn, breakpointsIn and ratiosIn are global properties
+        // Deliberatly without var so that breakpointsIn , imagesIn and ratiosIn are global properties
         // which can be deleted.
         imagesIn = {
-            "1":    [
-                '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
-                '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
-                '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">'
-            ],
-            "1.5": [
-                '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
-                '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
-                '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">'
-            ]
+            "1":    {
+                "300" : '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
+                "600" : '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
+                "800" : '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">',
+                "900" : '<img src="images/pixel_ratio_1/1000.gif" width="1000" height="1000">'
+            },
+            "1.5": {
+                "300" : '<img src="images/pixel_ratio_2/400.gif" width="400" height="450">',
+                "600" : '<img src="images/pixel_ratio_2/300.gif" width="300" height="300">',
+                "800" : '<img src="images/pixel_ratio_2/750.gif" width="750" height="400">',
+                "900" : '<img src="images/pixel_ratio_2/1000.gif" width="1000" height="1000">'
+            }
         },
-        breakpointsIn = [300,600,800,9000],
+        breakpointsIn = [300,600,800,900],
         ratiosIn = [1,1.5];
 
         // Device Pixel ratio
@@ -32,8 +34,8 @@ block test
 
     script(type='text/javascript')
 
-        var initialImageSelection = imgQry.images[[imagesIn, breakpointsIn, ratiosIn]],
-            expectedInitialImage = imagesIn['1'][1];
+        var initialImageSelection = imgQry.images[[breakpointsIn , imagesIn, ratiosIn]],
+            expectedInitialImage = imagesIn["1"]["600"];
 
         test('Initial image selection', function() {
             equal(initialImageSelection, expectedInitialImage, 'Expected first image to be second image for pixel ratio 1');
@@ -71,20 +73,22 @@ block test
         });
 
     script(type='text/javascript')
-        // imagesIn, breakpointsIn and ratiosIn are variables and not (as before) properties of the global object.
+        // breakpointsIn , imagesIn and ratiosIn are variables and not (as before) properties of the global object.
         var imagesIn = {
-                "1":    [
-                    '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
-                    '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
-                    '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">'
-                ],
-                "1.5": [
-                    '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
-                    '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
-                    '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">'
-                ]
+                "1":    {
+                    "300" : '<img src="images/pixel_ratio_1/400.gif" width="400" height="450">',
+                    "600" : '<img src="images/pixel_ratio_1/300.gif" width="300" height="300">',
+                    "800" : '<img src="images/pixel_ratio_1/750.gif" width="750" height="400">',
+                    "900" : '<img src="images/pixel_ratio_1/1000.gif" width="1000" height="1000">'
+                },
+                "1.5": {
+                    "300" : '<img src="images/pixel_ratio_2/400.gif" width="400" height="450">',
+                    "600" : '<img src="images/pixel_ratio_2/300.gif" width="300" height="300">',
+                    "800" : '<img src="images/pixel_ratio_2/750.gif" width="750" height="400">',
+                    "900" : '<img src="images/pixel_ratio_2/1000.gif" width="1000" height="1000">'
+                }
             },
-            breakpointsIn = [300,600,800,9000],
+            breakpointsIn = [300,600,800,900],
             ratiosIn = [1,1.5];
 
             // Device Pixel ratio
@@ -100,8 +104,8 @@ block test
 
     script(type='text/javascript')
 
-        var secondImageSelection = imgQry.images[[imagesIn, breakpointsIn, ratiosIn]],
-            expectedSecondImage = imagesIn['1'][1];
+        var secondImageSelection = imgQry.images[[breakpointsIn , imagesIn, ratiosIn]],
+            expectedSecondImage = imagesIn["1"]["600"];
 
         test('Cached image selection', function() {
             equal(secondImageSelection, initialImageSelection, 'Expected second image to be the same as first');
