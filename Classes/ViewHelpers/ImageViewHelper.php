@@ -1,5 +1,6 @@
 <?php
 use \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper as ImageViewHelper;
+use \TYPO3\CMS\Core\Utility\GeneralUtility as GeneralUtility;
 
 /* ============================================================================
  *
@@ -113,6 +114,11 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
     private $markers;
 
     /**
+     * @var
+     */
+    private $pixelRatios;
+
+    /**
      * @var string
      */
     private $defaultSource;
@@ -127,6 +133,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      * @param null $maxHeight
      * @param null $breakpoints
      * @param null $breakpoint
+     * @param null $pixelRatios
      * @param null $layout
      * @return string
      */
@@ -140,6 +147,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $maxHeight = null,
         $breakpoints = null,
         $breakpoint = null,
+        $pixelRatios = null,
         $layout = null
     ) {
 
@@ -153,6 +161,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
             $maxHeight,
             $breakpoints,
             $breakpoint,
+            $pixelRatios,
             $layout
         );
 
@@ -204,7 +213,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      */
     private function hasDefaultBreakpoint()
     {
-        return (boolean)$this->conf['breakpoint'];
+        return (boolean) $this->conf['breakpoint'];
     }
 
     /**
@@ -252,8 +261,8 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
                 $breakpoints[] = $this->defaultBreakpoint();
                 // Ensures the list is unique and converts values like 610:400 to 610
                 $breakpoints = array_map('intval', array_unique($breakpoints));
-                // Sorts the list numerically in reverse order (highest first(
-                rsort($breakpoints, SORT_NUMERIC);
+                // Sorts the list numerically in ascending order
+                sort($breakpoints, SORT_NUMERIC);
             }
 
             $this->breakpoints = $breakpoints;
@@ -319,6 +328,38 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
     }
 
     /*
+     * =======================================================
+     * Retina Images
+     * =======================================================
+     */
+
+    /**
+     * Returns an array of configured retina ratios to be used for image generation.
+     *
+     * @return array list of the configured retina ratios, will always include the default ratio "1"
+     */
+    private function pixelRatios()
+    {
+        if (is_null($this->pixelRatios)) {
+
+            $this->pixelRatios = array();
+
+            if (isset($this->conf['pixelRatios'])) {
+                $this->pixelRatios = GeneralUtility::trimExplode(',', $this->conf['pixelRatios'], true);
+            }
+
+            // The default device resolution is 1
+            array_unshift($this->pixelRatios, 1);
+
+            // Caches a list of unique values
+            $this->pixelRatios = array_unique(array_map('floatval', $this->pixelRatios));
+            sort($this->pixelRatios);
+        }
+
+        return $this->pixelRatios;
+    }
+
+    /*
      * ========================================================
      * Image dimensions
      * ========================================================
@@ -343,6 +384,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
                 // Avoid values which are not numeric, e.g. percentages
                 if (is_numeric($match[1])) {
                     $this->defaultWidth = $match[1];
+
                 } elseif ($this->defaultSource()) {
                     // TODO: Get image dimensions from image source
                 }
@@ -436,6 +478,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $maxHeight,
         $breakpoints,
         $breakpoint,
+        $pixelRatios,
         $layout
     ) {
         $this->conf['src'] = $src;
@@ -447,6 +490,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $this->conf['maxHeight'] = $maxHeight;
         $this->conf['breakpoints'] = $breakpoints;
         $this->conf['breakpoint'] = intval($breakpoint) > 0 ? intval($breakpoint) : false;
+        $this->conf['pixelRatios'] = $pixelRatios;
         $this->conf['layout'] = $layout;
     }
 
@@ -471,7 +515,8 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
                 $this->conf['maxWidth'],
                 $this->conf['maxHeight'],
                 $this->conf['breakpoints'],
-                $this->conf['breakpoint']
+                $this->conf['breakpoint'],
+                $this->conf['pixelRatios']
             );
         }
 
@@ -526,15 +571,16 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
             $this->images = array();
 
             if ($this->hasBreakpoints()) {
-
-                // Renders an image for each breakpoint/width combination
-                foreach ($this->breakpoints() as $breakpoint) {
-                    $width = $this->breakpointConfiguration($breakpoint);
-                    $this->images[$breakpoint] = parent::render(
-                        $this->conf['src'],
-                        $width,
-                        $this->getHeightForWidth($width)
-                    );
+                foreach ($this->pixelRatios() as $pixelRatio) {
+                    // Renders an image for each breakpoint/width combination
+                    foreach ($this->breakpoints() as $breakpoint) {
+                        $width = $this->breakpointConfiguration($breakpoint) * $pixelRatio;
+                        $this->images[strval($pixelRatio)][$breakpoint] = parent::render(
+                            $this->conf['src'],
+                            $width,
+                            $this->getHeightForWidth($width)
+                        );
+                    }
                 }
             }
         }
@@ -633,12 +679,9 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         if (is_null($this->markers)) {
             $this->markers = array(
                 '###DEFAULT_IMAGE###' => $this->defaultImage(),
-                '###DEFAULT_WIDTH###' => $this->defaultWidth(),
-                '###DEFAULT_BREAKPOINT###' => $this->defaultBreakpoint(),
                 '###BREAKPOINTS###' => json_encode($this->breakpoints()),
                 '###IMAGES###' => json_encode($this->images()),
-                '###ATTRIBUTES###' => json_encode($this->attributes()),
-                '###ID###' => json_encode($this->id())
+                '###RATIOS###' => json_encode($this->pixelRatios()),
             );
         }
         return $this->markers;
