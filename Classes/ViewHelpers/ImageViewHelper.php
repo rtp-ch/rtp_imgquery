@@ -38,7 +38,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
     /**
      * @var string
      */
-    const IMAGE_STYLE = 'width: 100%; height: auto;';
+    const DEFAULT_STYLE = 'width: 100%; height: auto;';
 
     /**
      * Default layout
@@ -133,6 +133,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      * @param null $maxHeight
      * @param null $breakpoints
      * @param null $breakpoint
+     * @param null $fluidStyle
      * @param null $pixelRatios
      * @param null $layout
      * @return string
@@ -147,6 +148,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $maxHeight = null,
         $breakpoints = null,
         $breakpoint = null,
+        $fluidStyle = null,
         $pixelRatios = null,
         $layout = null
     ) {
@@ -161,21 +163,82 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
             $maxHeight,
             $breakpoints,
             $breakpoint,
+            $fluidStyle,
             $pixelRatios,
             $layout
         );
 
         if ($this->hasBreakpoints()) {
-            // TODO: An option to define/override the style
-            $this->tag->addAttribute('style', self::IMAGE_STYLE);
+
+            if ($this->hasFluidStyle()) {
+                $this->tag->addAttribute('style', $this->getFluidStyle());
+            }
+
             $imageHtml = $this->responsiveImage();
 
-            // Otherwise create the default image
         } else {
+            // Otherwise create the default image
             $imageHtml = $this->defaultImage();
         }
 
         return $imageHtml;
+    }
+
+    /*
+     * ========================================================
+     * Style
+     * ========================================================
+     */
+
+    /**
+     * Gets the style attached to responsive images (the image dimensions should be fluid
+     * until it hits the next breakpoint).
+     *
+     * @return string
+     */
+    private function getFluidStyle()
+    {
+        if (isset($this->conf['style'])) {
+            $style = $this->conf['style'];
+
+        } else {
+            $style = self::DEFAULT_STYLE;
+        }
+
+        // Ensures trailing semicolon in inline style
+        if (substr($style, -1) !== ';') {
+            $style .= ';';
+        }
+
+        return $style;
+    }
+
+    /**
+     * Checks if default inline styles should be applied
+     *
+     * @return bool
+     */
+    private function hasFluidStyle()
+    {
+        $style = trim($this->conf['style']);
+
+        if ((boolean) $style) {
+
+            // If a style has been set and that style is falsey value then fluid image style is disabled
+            if (preg_match("/^(off|false|no|none|0)$/i", $style)) {
+                $hasStyle = false;
+
+            } else {
+                $hasStyle = true;
+            }
+
+        } else {
+            // If no style has been set check the default behaviour
+            $extConf = (array) unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['rtp_imgquery']);
+            $hasStyle = (boolean) $extConf['enableFluidImages'] ? true : false;
+        }
+
+        return $hasStyle;
     }
 
     /*
@@ -466,6 +529,8 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      * @param $maxHeight
      * @param $breakpoints
      * @param $breakpoint
+     * @param $style
+     * @param $pixelRatios
      * @param $layout
      */
     private function setConf(
@@ -478,6 +543,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $maxHeight,
         $breakpoints,
         $breakpoint,
+        $style,
         $pixelRatios,
         $layout
     ) {
@@ -490,6 +556,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $this->conf['maxHeight'] = $maxHeight;
         $this->conf['breakpoints'] = $breakpoints;
         $this->conf['breakpoint'] = intval($breakpoint) > 0 ? intval($breakpoint) : false;
+        $this->conf['style'] = $style;
         $this->conf['pixelRatios'] = $pixelRatios;
         $this->conf['layout'] = $layout;
     }
@@ -513,10 +580,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
                 $this->conf['minWidth'],
                 $this->conf['minHeight'],
                 $this->conf['maxWidth'],
-                $this->conf['maxHeight'],
-                $this->conf['breakpoints'],
-                $this->conf['breakpoint'],
-                $this->conf['pixelRatios']
+                $this->conf['maxHeight']
             );
         }
 
@@ -604,11 +668,14 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
     private function attribute($breakpoint)
     {
         $attributes = $this->attributes();
+
         if (is_array($attributes[$breakpoint]) && !empty($attributes[$breakpoint])) {
             $attribute = $attributes[$breakpoint];
+
         } else {
             $attribute = null;
         }
+
         return $attribute;
     }
 
@@ -621,6 +688,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
     {
         if (is_null($this->attributes)) {
             $this->attributes = array();
+
             foreach ($this->images() as $breakpoint => $image) {
                 // http://stackoverflow.com/questions/317053/regular-expression-for-extracting-tag-attributes
                 if (preg_match_all('/(\S+)=["\']?((?:.(?!["\']?\s+(?:\S+)=|[>"\']))+.)["\']?/s', $image, $attributes)) {
@@ -628,6 +696,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
                 }
             }
         }
+
         return $this->attributes;
     }
 
@@ -647,6 +716,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         if (is_null(self::$layoutContent[$this->layout()])) {
             self::$layoutContent[$this->layout()] = t3lib_div::getURL($this->layout());
         }
+
         return self::$layoutContent[$this->layout()];
     }
 
@@ -659,6 +729,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
     {
         if (is_null($this->layout)) {
             $this->layout = t3lib_div::getFileAbsFileName(self::DEFAULT_LAYOUT);
+
             if (isset($this->conf['layout'])) {
                 $layout = $this->conf['layout'];
                 if (is_readable($layout)) {
@@ -666,6 +737,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
                 }
             }
         }
+
         return $this->layout;
     }
 

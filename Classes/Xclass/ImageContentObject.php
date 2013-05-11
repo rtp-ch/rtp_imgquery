@@ -212,7 +212,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
     {
         if (!$this->cache->has('style')) {
 
-            if (isset($this->conf['breakpoints.']['style']) && (boolean)$this->conf['breakpoints.']['style']) {
+            if (isset($this->conf['breakpoints.']['style']) && (boolean) $this->conf['breakpoints.']['style']) {
                 $style = $this->conf['breakpoints.']['style'];
 
             } else {
@@ -255,7 +255,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
 
             } else {
                 // If no style has been set check the default behaviour
-                $extConf = (array)unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['rtp_imgquery']);
+                $extConf = (array) unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['rtp_imgquery']);
                 $hasStyle = (boolean)$extConf['enableFluidImages'] ? true : false;
             }
         }
