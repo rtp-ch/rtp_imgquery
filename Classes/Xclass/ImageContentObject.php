@@ -57,7 +57,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
     /**
      * Registry retains information about generated images
      *
-     * @var null
+     * @var \RTP\RtpImgquery\Configuration\Cache
      */
     private $cache;
 
@@ -102,7 +102,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
     private $id;
 
     /**
-     * @var tslib_content
+     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
      */
     public $cObj;
 
@@ -114,46 +114,20 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
      */
     public function render($conf = array())
     {
-        // Initialize the IMAGE object. Note that "tslib_content_Image" is implemented as a singleton
-        // so a variable ($registry) and a unique id are used to store the details of individual IMAGE objects.
-        $this->conf = $conf;
-        $this->defaultImage = $this->cObj->cImage($this->conf['file'], $this->conf);
-        $cacheIdentity = array($this->defaultImage, $conf);
-        $this->cache = GeneralUtility::makeInstance('RTP\RtpImgquery\Configuration\Cache', $cacheIdentity);
-
         if ($this->cObj->checkif($conf['if.'])) {
 
-            if ($this->hasDebug()) {
-                \t3lib_utility_Debug::debug(
-                    array(
-                        '================' => '================',
-                        'conf' => $this->conf,
-                        'hasBreakpoints' => $this->hasBreakpoints(),
-                        'tx_rtpimgquery_breakpoints' => $this->cObj->data['tx_rtpimgquery_breakpoints'],
-                        'tx_rtpimgquery_breakpoint' => $this->cObj->data['tx_rtpimgquery_breakpoint'],
-                    )
-                );
-            }
+            // Initialize the IMAGE object. Note that "tslib_content_Image" is implemented as a singleton
+            // so a variable ($registry) and a unique id are used to store the details of individual IMAGE objects.
+            $this->conf = $conf;
+            $this->defaultImage = $this->cObj->cImage($this->conf['file'], $this->conf);
+            $cacheIdentity = array($this->defaultImage, $conf);
+            $this->cache = GeneralUtility::makeInstance('RTP\RtpImgquery\Configuration\Cache', $cacheIdentity);
 
             // If breakpoints have been defined in the TypoScript configuration create
-            // a responsive version of the image
-            if ($this->hasBreakpoints()) {
-
+            // a responsive version of the image. Note that a default breakpoint (i.e. the breakpoint that
+            // corresponds to the image as is in order to gauge the implied image dimensions for further breakpoints.
+            if ($this->hasDefaultBreakpoint() && $this->hasBreakpoints()) {
                 $imageHtml = $this->responsiveImage();
-
-                if ($this->hasDebug()) {
-                    \t3lib_utility_Debug::debug(
-                        array(
-                            'defaultImage' => $this->defaultImage(),
-                            'defaultWidth' => $this->defaultWidth(),
-                            'breakpoints' => $this->breakpoints(),
-                            'defaultBreakpoint' => $this->defaultBreakpoint(),
-                            'impliedConf' => $this->impliedConfigurations(),
-                            'images' => $this->images(),
-                            'markers' => $this->markers()
-                        )
-                    );
-                }
 
             } else {
                 // Otherwise create the default image
@@ -162,15 +136,6 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
 
             if (isset($conf['stdWrap.'])) {
                 $imageHtml = $this->cObj->stdWrap($imageHtml, $conf['stdWrap.']);
-            }
-
-            if ($this->hasDebug()) {
-                \t3lib_utility_Debug::debug(
-                    array(
-                        'imageHtml' => $imageHtml,
-                        '================' => '================',
-                    )
-                );
             }
 
             return $imageHtml;
@@ -190,6 +155,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
      */
     private function responsiveImage()
     {
+
         if (count($this->breakpoints()) > 1) {
             $search = array_keys($this->markers());
             $replace = $this->markers();
@@ -244,7 +210,6 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
      */
     private function getStyle()
     {
-
         if (!$this->cache->has('style')) {
 
             if (isset($this->conf['breakpoints.']['style']) && (boolean)$this->conf['breakpoints.']['style']) {
@@ -262,7 +227,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
             $this->cache->set('style', $style);
         }
 
-        return $this->cache->get('style', $style);
+        return $this->cache->get('style');
     }
 
     /**
@@ -365,35 +330,6 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
         }
 
         return $this->cache->get('images');
-    }
-
-    /*
-     * ========================================================
-     * Configuration
-     * ========================================================
-     */
-
-    /**
-     * Checks if debugging is enabled
-     *
-     * @return bool
-     */
-    private function hasDebug()
-    {
-        if (!$this->cache->has('debug')) {
-
-            $hasDebug = false;
-
-            if (isset($this->conf['breakpoints.']['debug']) && (boolean)$this->conf['breakpoints.']['debug']) {
-                if (preg_match("/^(on|true|yes|1)$/i", trim($this->conf['breakpoints.']['debug']))) {
-                    $hasDebug = true;
-                }
-            }
-
-            $this->cache->set('debug', $hasDebug);
-        }
-
-        return $this->cache->get('debug');
     }
 
     /**
@@ -659,20 +595,32 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
     {
         if (!$this->cache->has('defaultBreakpoint')) {
 
-            if ($this->cObj->data['tx_rtpimgquery_breakpoint']) {
+            if (intval($this->cObj->data['tx_rtpimgquery_breakpoint']) > 0) {
                 $defaultBreakpoint = intval($this->cObj->data['tx_rtpimgquery_breakpoint']);
 
-            } elseif ($this->conf['breakpoint']) {
+            } elseif (intval($this->conf['breakpoint']) > 0) {
                 $defaultBreakpoint = intval($this->conf['breakpoint']);
 
             } else {
                 $defaultBreakpoint = intval($this->defaultWidth());
             }
 
-            $this->cache->set('defaultBreakpoint', $defaultBreakpoint);
+            if ($defaultBreakpoint) {
+                $this->cache->set('defaultBreakpoint', $defaultBreakpoint);
+            }
         }
 
         return $this->cache->get('defaultBreakpoint');
+    }
+
+    /**
+     * Checks for a defined default breakpoint
+     *
+     * @return bool
+     */
+    private function hasDefaultBreakpoint()
+    {
+        return (boolean) $this->defaultBreakpoint();
     }
 
     /**
@@ -682,7 +630,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
      */
     private function hasBreakpoints()
     {
-        return (boolean)$this->breakpoints();
+        return (boolean) $this->breakpoints();
     }
 
 
