@@ -198,19 +198,19 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      */
     private function getFluidStyle()
     {
-        if (isset($this->conf['style'])) {
-            $style = $this->conf['style'];
+        if (isset($this->conf['fluidStyle'])) {
+            $fluidStyle = $this->conf['fluidStyle'];
 
         } else {
-            $style = self::DEFAULT_STYLE;
+            $fluidStyle = self::DEFAULT_STYLE;
         }
 
         // Ensures trailing semicolon in inline style
-        if (substr($style, -1) !== ';') {
-            $style .= ';';
+        if (substr($fluidStyle, -1) !== ';') {
+            $fluidStyle .= ';';
         }
 
-        return $style;
+        return $fluidStyle;
     }
 
     /**
@@ -220,25 +220,25 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      */
     private function hasFluidStyle()
     {
-        $style = trim($this->conf['style']);
+        $fluidStyle = trim($this->conf['fluidStyle']);
 
-        if ((boolean) $style) {
+        if ((boolean) $fluidStyle) {
 
             // If a style has been set and that style is falsey value then fluid image style is disabled
-            if (preg_match("/^(off|false|no|none|0)$/i", $style)) {
-                $hasStyle = false;
+            if (preg_match("/^(off|false|no|none|0)$/i", $fluidStyle)) {
+                $hasFluidStyle = false;
 
             } else {
-                $hasStyle = true;
+                $hasFluidStyle = true;
             }
 
         } else {
             // If no style has been set check the default behaviour
             $extConf = (array) unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['rtp_imgquery']);
-            $hasStyle = (boolean) $extConf['enableFluidImages'] ? true : false;
+            $hasFluidStyle = (boolean) $extConf['enableFluidImages'] ? true : false;
         }
 
-        return $hasStyle;
+        return $hasFluidStyle;
     }
 
     /*
@@ -529,7 +529,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      * @param $maxHeight
      * @param $breakpoints
      * @param $breakpoint
-     * @param $style
+     * @param $fluidStyle
      * @param $pixelRatios
      * @param $layout
      */
@@ -543,7 +543,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $maxHeight,
         $breakpoints,
         $breakpoint,
-        $style,
+        $fluidStyle,
         $pixelRatios,
         $layout
     ) {
@@ -556,7 +556,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $this->conf['maxHeight'] = $maxHeight;
         $this->conf['breakpoints'] = $breakpoints;
         $this->conf['breakpoint'] = intval($breakpoint) > 0 ? intval($breakpoint) : false;
-        $this->conf['style'] = $style;
+        $this->conf['fluidStyle'] = $fluidStyle;
         $this->conf['pixelRatios'] = $pixelRatios;
         $this->conf['layout'] = $layout;
     }
