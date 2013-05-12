@@ -754,6 +754,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
                 '###BREAKPOINTS###' => json_encode($this->breakpoints()),
                 '###IMAGES###' => json_encode($this->images()),
                 '###RATIOS###' => json_encode($this->pixelRatios()),
+                '###CACHE_KEY###' => md5(serialize($this->images()))
             );
         }
         return $this->markers;
