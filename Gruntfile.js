@@ -91,7 +91,8 @@ module.exports = function (grunt) {
             script = grunt.file.read(jsFile)
                 .replace(/imagesIn/gi, '###IMAGES###')
                 .replace(/breakpointsIn/gi, '###BREAKPOINTS###')
-                .replace(/ratiosIn/gi, '###RATIOS###');
+                .replace(/ratiosIn/gi, '###RATIOS###')
+                .replace(/cacheKeyIn/gi, '"###CACHE_KEY###"');
 
             content = grunt.file.read(f)
                 .replace(/###SCRIPT###/gi, script);

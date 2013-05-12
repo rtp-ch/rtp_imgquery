@@ -23,7 +23,8 @@ block test
                 }
             },
             breakpointsIn = [500,700,800,1000],
-            ratiosIn = [1,1.5,2];
+            ratiosIn = [1,1.5,2],
+            cacheKeyIn = JSON.stringify(imagesIn);
 
         // Device Pixel ratio
         imgQry.ratios = {};
@@ -38,7 +39,7 @@ block test
 
     script(type='text/javascript')
         test('Large image selection for window width 1200', function() {
-            var actualImage = imgQry.images[[breakpointsIn , imagesIn, ratiosIn]],
+            var actualImage = imgQry.images[cacheKeyIn],
                 expectedImage = imagesIn["1.5"]["1000"];
             equal(actualImage, expectedImage, 'Expected largest image for pixel ratio 1.5');
         });

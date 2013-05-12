@@ -19,7 +19,8 @@ block test
             }
         },
         breakpointsIn = [300,600,800,900],
-        ratiosIn = [1,1.5];
+        ratiosIn = [1,1.5],
+        cacheKeyIn = JSON.stringify(imagesIn);
 
         // Device Pixel ratio
         imgQry.ratios = {};
@@ -34,7 +35,7 @@ block test
 
     script(type='text/javascript')
 
-        var initialImageSelection = imgQry.images[[breakpointsIn , imagesIn, ratiosIn]],
+        var initialImageSelection = imgQry.images[cacheKeyIn],
             expectedInitialImage = imagesIn["1"]["600"];
 
         test('Initial image selection', function() {
@@ -60,16 +61,19 @@ block test
 
         delete(imagesIn);
         delete(breakpointsIn);
-        delete(ratiosIn);
+        delete(ratiosIn)
+        delete(cacheKeyIn);
 
         var initialImagasIn = typeof(imagesIn),
             initialBreakpointsIn = typeof(breakpointsIn),
-            initialRatiosIn = typeof(ratiosIn);
+            initialRatiosIn = typeof(ratiosIn),
+            initialCacheKeyIn = typeof(cacheKeyIn);
 
         test('Arguments have been cleared', function() {
             equal(initialImagasIn, 'undefined', 'Expecting imagesIn to be undefined.');
             equal(initialBreakpointsIn, 'undefined', 'Expecting breakpointsIn to be undefined.');
             equal(initialRatiosIn, 'undefined', 'Expecting ratiosIn to be undefined.');
+            equal(initialCacheKeyIn, 'undefined', 'Expecting cacheKeyIn to be undefined.');
         });
 
     script(type='text/javascript')
@@ -89,7 +93,8 @@ block test
                 }
             },
             breakpointsIn = [300,600,800,900],
-            ratiosIn = [1,1.5];
+            ratiosIn = [1,1.5],
+            cacheKeyIn = JSON.stringify(imagesIn);
 
             // Device Pixel ratio
             imgQry.ratios = {};
@@ -104,7 +109,7 @@ block test
 
     script(type='text/javascript')
 
-        var secondImageSelection = imgQry.images[[breakpointsIn , imagesIn, ratiosIn]],
+        var secondImageSelection = imgQry.images[cacheKeyIn],
             expectedSecondImage = imagesIn["1"]["600"];
 
         test('Cached image selection', function() {

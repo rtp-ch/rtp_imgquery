@@ -37,7 +37,8 @@
               }
       },
           breakpointsIn = [500,700,800,1000],
-          ratiosIn = [1,1.5,2];
+          ratiosIn = [1,1.5,2],
+          cacheKeyIn = JSON.stringify(imagesIn);
           
       // Device Pixel ratio
       imgQry.ratios = {};
@@ -46,10 +47,10 @@
       // Window width
       imgQry.width = 300;
       
-    </script><script type="text/javascript">({write:function(i){"loading"===document.readyState&&document.write(i)},closest:function(i,t){"use strict";for(var r=i.length,o=0;r>o&&!(i[o]>=t);)o+=1;return o=o===r?r-1:o},sort:function(i,t){"use strict";return t>i?-1:t>i?1:0},imgQry:function(i,t,r,o){"use strict";t=t.sort(this.sort),o=o.sort(this.sort);var e=Array.prototype.slice.call(arguments,1);i.imgQry===void 0&&(i.imgQry={}),i.images===void 0&&(i.imgQry.images={}),i.ratios===void 0&&(i.imgQry.ratios={}),i.breakpoints===void 0&&(i.imgQry.breakpoints={}),i.imgQry.width===void 0&&(i.imgQry.width=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth||0),i.imgQry.ratio===void 0&&(i.imgQry.ratio=i.devicePixelRatio!==void 0?i.devicePixelRatio:1),i.imgQry.ratios[o]===void 0&&(i.imgQry.ratios[o]=o[this.closest(o,i.imgQry.ratio)]),i.imgQry.breakpoints[t]===void 0&&(i.imgQry.breakpoints[t]=t[this.closest(t,i.imgQry.width)]),i.imgQry.images[e]===void 0&&(i.imgQry.images[e]=r[i.imgQry.ratios[o]][i.imgQry.breakpoints[t]]),this.write(i.imgQry.images[e])}}).imgQry(this,breakpointsIn,imagesIn,ratiosIn);</script>
+    </script><script type="text/javascript">({write:function(i){"loading"===document.readyState&&document.write(i)},closest:function(i,t){"use strict";for(var r=i.length,o=0;r>o&&!(i[o]>=t);)o+=1;return o=o===r?r-1:o},sort:function(i,t){"use strict";return t>i?-1:t>i?1:0},imgQry:function(i,t,r,o,e){"use strict";t=t.sort(this.sort),o=o.sort(this.sort),i.imgQry===void 0&&(i.imgQry={}),i.imgQry.images===void 0&&(i.imgQry.images={}),i.imgQry.ratios===void 0&&(i.imgQry.ratios={}),i.imgQry.breakpoints===void 0&&(i.imgQry.breakpoints={}),i.imgQry.width===void 0&&(i.imgQry.width=window.innerWidth||document.documentElement.clientWidth||document.body.clientWidth||0),i.imgQry.ratio===void 0&&(i.imgQry.ratio=i.devicePixelRatio!==void 0?i.devicePixelRatio:1),i.imgQry.ratios[o]===void 0&&(i.imgQry.ratios[o]=o[this.closest(o,i.imgQry.ratio)]),i.imgQry.breakpoints[t]===void 0&&(i.imgQry.breakpoints[t]=t[this.closest(t,i.imgQry.width)]),i.imgQry.images[e]===void 0&&(i.imgQry.images[e]=r[i.imgQry.ratios[o]][i.imgQry.breakpoints[t]]),this.write(i.imgQry.images[e])}}).imgQry(this,breakpointsIn,imagesIn,ratiosIn,cacheKeyIn);</script>
     <script type="text/javascript">
       test('Small image selection for window width 300', function() {
-          var actualImage = imgQry.images[[breakpointsIn, imagesIn, ratiosIn]],
+          var actualImage = imgQry.images[cacheKeyIn],
               expectedImage = imagesIn["2"]["500"];
           equal(actualImage, expectedImage, 'Expected smallest image for pixel ratio 2');
       });
