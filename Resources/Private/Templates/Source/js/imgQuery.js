@@ -12,7 +12,7 @@
      */
     write: function (image) {
         /* jshint strict: false, evil: true */
-        if (document.readyState === 'loading') {
+        if (document.readyState !== 'complete') {
             document.write(image);
         }
     },
