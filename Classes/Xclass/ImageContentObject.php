@@ -1,7 +1,7 @@
 <?php
 namespace RTP\RtpImgquery\Xclass;
 
-use \TYPO3\CMS\Core\Utility\GeneralUtility as GeneralUtility;
+use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
 
 /* ============================================================================
  *
@@ -17,40 +17,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility as GeneralUtility;
  * ============================================================================
  */
 
-/**
- * Extends the TypoScript IMAGE object to accommodate responsive and
- * fluid image techniques. Automatically adds equivalent functionality
- * to the smarty image plugin.
- *
- * TypoScript example:
- *  10 = IMAGE
- *  10 {
- *      file = fileadmin/images/myimage.jpg
- *      file.width = 800
- *      altText = Hey, I'm responsive!
- *      params = class="enlarge"
- *      breakpoint = 1200
- *      breakpoints = 600:400,400:280,320:160
- *      breakpoints.320.file.height = 90
- *      breakpoints.pixelRatios = 1,1.5,2
- *  }
- *
- * Smarty example:
- *  {image
- *      file = "fileadmin/images/myimage.jpg"
- *      file.width = "800"
- *      altText = "Hey, I'm responsive!"
- *      params = "class=\"enlarge\""
- *      breakpoint = 1200
- *      breakpoints = 600:400,400:280,320:160
- *      breakpoints.320.file.height = 90
- *      breakpoints.pixelRatios = 1,1.5,2
- *  }
- *
- * @author  Simon Tuck <stu@rtp.ch>
- * @link https://github.com/rtp-ch/rtp_imgquery
- * @todo: Refactor & merge with view helper methods.
- */
+
 class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentObject
 {
     /**
@@ -119,6 +86,37 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
         $this->conf = $conf;
 
         if ($this->cObj->checkif($this->conf['if.'])) {
+
+
+
+            $defaultImage = Compatibility::makeInstance(
+                '\RTP\RtpImgquery\Main\Image',
+                $this->conf,
+                $this->cObj
+            );
+
+            $defaultWidth = Compatibility::makeInstance(
+                '\RTP\RtpImgquery\Main\Width',
+                $this->conf,
+                $this->cObj,
+                $defaultImage
+            );
+
+            $defaultHeight = Compatibility::makeInstance(
+                '\RTP\RtpImgquery\Main\Height',
+                $this->conf,
+                $this->cObj,
+                $defaultImage
+            );
+
+            $pixelRatios = Compatibility::makeInstance(
+                '\RTP\RtpImgquery\Client\PixelRatios',
+                $this->conf,
+                $this->cObj,
+                $defaultImage
+            );
+
+
 
             $this->setDefaultImage();
             $this->setPixelRatios();
