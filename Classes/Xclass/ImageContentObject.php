@@ -200,20 +200,23 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
         $this->fluidStyle = false;
         $extConf = (array) unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['rtp_imgquery']);
 
-        // If no style has been set check the default behaviour
-        if (preg_match("/^(off|false|no|none|0)$/i", $this->conf['breakpoints.']['style'])
-            || !$extConf['enableFluidImages']) {
+        // Fluid image style has to be enabled globally
+        if ($extConf['enableFluidImages']) {
 
-            if (isset($this->conf['breakpoints.']['style'])) {
-                $this->fluidStyle = $this->conf['breakpoints.']['style'];
+            // The style has to be defined in the TypoScript configuration
+            $style = $this->conf['breakpoints.']['style'];
 
-            } else {
-                $this->fluidStyle = self::DEFAULT_STYLE;
-            }
+            // If it's enabled it can be disabled on a case-by-case basis by setting
+            // a falsy or empty value
+            if ($style && !preg_match("/^(off|false|no|none|0)$/i", $style)) {
 
-            // Ensures trailing semicolon in inline style
-            if (substr($this->fluidStyle, -1) !== ';') {
-                $this->fluidStyle .= ';';
+                // Sets fluidStyle from the configuration
+                $this->fluidStyle = $style;
+
+                // Ensures trailing semicolon in inline style
+                if (substr($this->fluidStyle, -1) !== ';') {
+                    $this->fluidStyle .= ';';
+                }
             }
         }
     }
