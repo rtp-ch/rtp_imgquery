@@ -285,11 +285,16 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
                     $impliedConfiguration = $this->getImpliedConfigurations($breakpoint);
 
                     if ($pixelRatio > 1) {
-                        $standardWidth = $impliedConfiguration['file.']['width'];
-                        $impliedConfiguration['file.']['width'] = $pixelRatio * $standardWidth;
 
-                        $standardHeight = $impliedConfiguration['file.']['height'];
-                        $impliedConfiguration['file.']['height'] = $pixelRatio * $standardHeight;
+                        $impliedConfiguration['file.']['width'] = self::getNewDimension(
+                            $pixelRatio * intval($impliedConfiguration['file.']['width']),
+                            $impliedConfiguration['file.']['width']
+                        );
+
+                        $impliedConfiguration['file.']['height'] = self::getNewDimension(
+                            $pixelRatio * intval($impliedConfiguration['file.']['height']),
+                            $impliedConfiguration['file.']['height']
+                        );
                     }
 
                     // Generate the corresponding image with the implied typoscript configuration
@@ -306,6 +311,21 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
                 }
             }
         }
+    }
+
+    /**
+     * @param $newDim
+     * @param $oldDim
+     * @return mixed
+     */
+    private static function getNewDimension($newDim, $oldDim)
+    {
+        $newDim = preg_replace('/^\d+/', $newDim, $oldDim);
+        if (preg_match('/\d+[A-Za-z]{0,1}/', $newDim, $match)) {
+            $newDim = $match[0];
+        }
+
+        return $newDim;
     }
 
     /**
@@ -372,7 +392,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
 
             if ($settings && preg_match('/' . $breakpoint . ':(\w+)/i', $settings, $width)) {
                 // Matches settings like 800:500 where 500 would be the image width for the breakpoint 800
-                $width = $width[1];
+                $width = self::getNewDimension($width[1], $this->getDefaultWidth());
 
             } else {
                 // Gets the implied image width from the breakpoint if no width was defined
@@ -458,6 +478,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
 
                 // Unsets the "breakpoint/breakpoints" settings.
                 unset($this->impliedConfigurations[$breakpoint]['file.']['breakpoint']);
+                unset($this->impliedConfigurations[$breakpoint]['breakpoint']);
                 unset($this->impliedConfigurations[$breakpoint]['breakpoints']);
                 unset($this->impliedConfigurations[$breakpoint]['breakpoints.']);
             }
@@ -488,7 +509,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
         if ($modifiedWidth > 0 && $this->hasDefaultWidth() && $this->hasDefaultHeight()) {
             $modifiedHeight = $modifiedWidth / intval($this->getDefaultWidth());
             $modifiedHeight = floor($modifiedHeight * intval($this->getDefaultHeight()));
-            $modifiedHeight = preg_replace('/\d+/', $modifiedHeight, $this->getDefaultHeight());
+            $modifiedHeight = self::getNewDimension($modifiedHeight, $this->getDefaultHeight());
         }
 
         return $modifiedHeight;
@@ -551,7 +572,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
         if ($this->hasDefaultWidth() && $this->hasDefaultBreakpoint()) {
             $modifiedWidth = $breakpoint / $this->getDefaultBreakpoint();
             $modifiedWidth = floor($modifiedWidth * intval($this->getDefaultWidth()));
-            $modifiedWidth = preg_replace('/^\d+/', $modifiedWidth, $this->getDefaultWidth());
+            $modifiedWidth = self::getNewDimension($modifiedWidth, $this->getDefaultWidth());
         }
 
         return $modifiedWidth;
