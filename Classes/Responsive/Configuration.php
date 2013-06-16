@@ -1,7 +1,8 @@
 <?php
 namespace RTP\RtpImgquery\Responsive;
 
-use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
+use \RTP\RtpImgquery\Service\Compatibility;
+use RTP\RtpImgquery\Utility\TypoScript;
 
 /* ============================================================================
  *
@@ -25,37 +26,44 @@ use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
 class Configuration
 {
     /**
-     * @var \RTP\RtpImgquery\Main\Width
+     * @var int
      */
     private $defaultWidth;
 
     /**
-     * @var \RTP\RtpImgquery\Main\Height
+     * @var int
      */
     private $defaultHeight;
 
     /**
      * @var array TypoScript configuration
      */
-    private $conf;
+    private $configuration;
 
     /**
-     * @var \RTP\RtpImgquery\Client\Breakpoints
+     * @var string Breakpoint settings (e.g. 800:500, 1200:700)
      */
-    private $breakpoints;
+    private $settings;
 
     /**
-     * @param $conf
-     * @param $defaultWidth \RTP\RtpImgquery\Main\Width
-     * @param $defaultHeight \RTP\RtpImgquery\Main\Height
-     * @param $breakpoints \RTP\RtpImgquery\Client\Breakpoints
+     * @var int
      */
-    public function __construct($conf, $defaultWidth, $defaultHeight, $breakpoints)
+    private $defaultBreakpoint;
+
+    /**
+     * @param $configuration
+     * @param $defaultWidth int
+     * @param $defaultHeight int
+     * @param $defaultBreakpoint
+     * @param $settings string
+     */
+    public function __construct($configuration, $defaultWidth, $defaultHeight, $defaultBreakpoint, $settings)
     {
-        $this->conf = $conf;
-        $this->breakpoints = $breakpoints;
+        $this->configuration = $configuration;
         $this->defaultWidth = $defaultWidth;
         $this->defaultHeight = $defaultHeight;
+        $this->defaultBreakpoint = $defaultBreakpoint;
+        $this->settings = $settings;
     }
 
     /**
@@ -65,47 +73,26 @@ class Configuration
     public function getForBreakpoint($breakpoint)
     {
         // Starts out with the TypoScript for the default configuration
-        $configurationForBreakpoint = $this->conf;
+        $configuration = $this->configuration;
 
-        // Unsets "breakpoint/breakpoints" definitions which are not valid for image objects
-        unset($configurationForBreakpoint['breakpoints']);
-        unset($configurationForBreakpoint['breakpoints.']);
+        // Removes breakpoints typoscript which are invalid
+        $configuration = TypoScript::strip($configuration);
 
-        // Unsets additional image dimension settings which would disrupt the implied measurements
-        // for the current breakpoint.
-        unset($configurationForBreakpoint['file.']['maxW']);
-        unset($configurationForBreakpoint['file.']['maxH']);
-        unset($configurationForBreakpoint['file.']['minW']);
-        unset($configurationForBreakpoint['file.']['minH']);
-
-        // Gets the breakpoint settings (e.g. 800:500, 1200:700) from the content element or from TypoScript
-        $breakpointSettings = $this->breakpoints->getSettings();
-
-        // Attempts to match a setting like 800:500 where 500 would be the image width for
-        // the given breakpoint 800. In which case the width for the given breakpoint is defined.
-        if ($breakpointSettings && preg_match('/' . $breakpoint . ':(\w+)/i', $breakpointSettings, $width)) {
-            $configurationForBreakpoint['file.']['width'] = $width[1];
-
-        } else {
-            // Otherwise the width has to be inferred from the default width, the default breakpoint
-            // and the given breakpoint.
-            $configurationForBreakpoint['file.']['width'] = $this->getWidthImpliedByBreakpoint($breakpoint);
-        }
+        // Get the width implied by the breakpoint
+        $configuration['file.']['width'] = $this->getWidthForBreakpoint($breakpoint);
 
         // Determine the height from the width
-        $configurationForBreakpoint['file.']['height'] = $this->getHeightImpliedByWidth(
-            $configurationForBreakpoint['file.']['width']
-        );
+        $configuration['file.']['height'] = $this->getHeightForWidth($configuration['file.']['width']);
 
         // Merges in any specific configurations for the current breakpoint (e.g. breakpoints.500.x)
-        if (isset($this->conf['breakpoints.'][$breakpoint . '.'])) {
-            $configurationForBreakpoint['file.'] = Compatibility::arrayMergeRecursiveOverrule(
-                (array) $configurationForBreakpoint,
-                (array) $this->conf['breakpoints.'][$breakpoint . '.']
+        if (isset($this->configuration['breakpoints.'][$breakpoint . '.']['width'])) {
+            $configuration['file.'] = Compatibility::arrayMergeRecursiveOverrule(
+                (array) $configuration,
+                (array) $this->configuration['breakpoints.'][$breakpoint . '.']
             );
         }
 
-        return $configurationForBreakpoint;
+        return $configuration;
     }
 
     /**
@@ -115,19 +102,26 @@ class Configuration
      * @param $breakpoint
      * @return string
      */
-    public function getWidthImpliedByBreakpoint($breakpoint)
+    public function getWidthForBreakpoint($breakpoint)
     {
-        $widthForBreakpoint = false;
+        $width = false;
 
-        // The image width for the given breakpoint is the relation of the default breakpoint to the
-        // given breakpoint multiplied with the default width
-        if ($this->defaultWidth->has() && $this->breakpoints->hasDefault()) {
-            $widthForBreakpoint = $breakpoint / $this->breakpoints->getDefault();
-            $widthForBreakpoint = floor($widthForBreakpoint * intval($this->defaultWidth->get()));
-            $widthForBreakpoint = preg_replace('/^\d+/', $widthForBreakpoint, $this->defaultWidth->get());
+        // Attempts to match a setting like 800:500 where 500 would be the image width for
+        // the given breakpoint 800. In which case the width for the given breakpoint is defined.
+        if ($this->settings && preg_match('/' . $breakpoint . ':(\w+)/i', $this->settings, $width)) {
+            $width = TypoScript::getNewDimension($width[1], $this->defaultWidth);
+
+        } else {
+            // The image width for the given breakpoint is the relation of the default breakpoint to the
+            // given breakpoint multiplied with the default width
+            if ($this->defaultWidth && $this->defaultBreakpoint) {
+                $width = $breakpoint / $this->defaultBreakpoint;
+                $width = floor($width * intval($this->defaultWidth));
+                $width = TypoScript::getNewDimension($width, $this->defaultWidth);
+            }
         }
 
-        return $widthForBreakpoint;
+        return $width;
     }
 
     /**
@@ -136,18 +130,18 @@ class Configuration
      * @param string $width
      * @return int|string
      */
-    public function getHeightImpliedByWidth($width)
+    public function getHeightForWidth($width)
     {
-        $heightForWidth = false;
+        $height = false;
 
         // The new height is the relation between the new width multiplied with the original height
-        if ($width > 0 && $this->defaultWidth->has() && $this->defaultHeight->has()) {
-            $heightForWidth = $width / intval($this->defaultWidth->get());
-            $heightForWidth = floor($heightForWidth * intval($this->defaultHeight->get()));
-            $heightForWidth = preg_replace('/\d+/', $heightForWidth, $this->defaultHeight->get());
+        if ($width > 0 && $this->defaultWidth && $this->defaultHeight) {
+            $height = $width / intval($this->defaultWidth);
+            $height = floor($height * intval($this->defaultHeight));
+            $height = TypoScript::getNewDimension($height, $this->defaultHeight);
         }
 
-        return $heightForWidth;
+        return $height;
     }
 }
 

@@ -17,40 +17,7 @@ use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
  * ============================================================================
  */
 
-/**
- * Extends the TypoScript IMAGE object to accommodate responsive and
- * fluid image techniques. Automatically adds equivalent functionality
- * to the smarty image plugin.
- *
- * TypoScript example:
- *  10 = IMAGE
- *  10 {
- *      file = fileadmin/images/myimage.jpg
- *      file.width = 800
- *      altText = Hey, I'm responsive!
- *      params = class="enlarge"
- *      breakpoint = 1200
- *      breakpoints = 600:400,400:280,320:160
- *      breakpoints.320.file.height = 90
- *      breakpoints.pixelRatios = 1,1.5,2
- *  }
- *
- * Smarty example:
- *  {image
- *      file = "fileadmin/images/myimage.jpg"
- *      file.width = "800"
- *      altText = "Hey, I'm responsive!"
- *      params = "class=\"enlarge\""
- *      breakpoint = 1200
- *      breakpoints = 600:400,400:280,320:160
- *      breakpoints.320.file.height = 90
- *      breakpoints.pixelRatios = 1,1.5,2
- *  }
- *
- * @author  Simon Tuck <stu@rtp.ch>
- * @link https://github.com/rtp-ch/rtp_imgquery
- * @todo: Refactor & merge with view helper methods.
- */
+
 class Style
 {
     /**
@@ -78,6 +45,7 @@ class Style
     public function __construct($configuration)
     {
         $this->conf = $configuration;
+        $this->set();
     }
 
     /**
@@ -107,25 +75,54 @@ class Style
     /**
      *
      */
-    public function set()
+    private function set()
     {
         $this->style = false;
         $extConf = (array) unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['rtp_imgquery']);
 
-        // If no style has been set check the default behaviour
-        if (preg_match("/^(off|false|no|none|0)$/i", $this->conf['breakpoints.']['style'])
-            || !$extConf['enableFluidImages']) {
+        // Fluid image style has to be enabled globally
+        if ($extConf['enableFluidImages']) {
 
-            if (isset($this->conf['breakpoints.']['style'])) {
-                $this->style = $this->conf['breakpoints.']['style'];
+            // The style has to be defined in the TypoScript configuration
+            $style = $this->conf['breakpoints.']['style'];
 
-            } else {
-                $this->style = self::DEFAULT_STYLE;
+            // If it's enabled it can be disabled on a case-by-case basis by setting
+            // a falsy or empty value
+            if ($style && !preg_match("/^(off|false|no|none|0)$/i", $style)) {
+
+                // Sets fluidStyle from the configuration
+                $this->style = $style;
+
+                // Ensures trailing semicolon in inline style
+                if (substr($this->style, -1) !== ';') {
+                    $this->style .= ';';
+                }
             }
+        }
+    }
 
-            // Ensures trailing semicolon in inline style
-            if (substr($this->style, -1) !== ';') {
-                $this->style .= ';';
+    private function setFluidStyle()
+    {
+        $this->fluidStyle = false;
+        $extConf = (array) unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['rtp_imgquery']);
+
+        // Fluid image style has to be enabled globally
+        if ($extConf['enableFluidImages']) {
+
+            // The style has to be defined in the TypoScript configuration
+            $style = $this->conf['breakpoints.']['style'];
+
+            // If it's enabled it can be disabled on a case-by-case basis by setting
+            // a falsy or empty value
+            if ($style && !preg_match("/^(off|false|no|none|0)$/i", $style)) {
+
+                // Sets fluidStyle from the configuration
+                $this->fluidStyle = $style;
+
+                // Ensures trailing semicolon in inline style
+                if (substr($this->fluidStyle, -1) !== ';') {
+                    $this->fluidStyle .= ';';
+                }
             }
         }
     }

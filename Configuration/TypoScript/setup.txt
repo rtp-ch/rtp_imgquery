@@ -9,7 +9,7 @@ tt_content.image.20.1 {
 
     breakpoints = {$styles.content.breakpoints}
 
-    breakpoints.layout = {$styles.content.breakpoints.layout}
+    breakpoints.strategy = {$styles.content.breakpoints.strategy}
 
     breakpoints.style = {$styles.content.breakpoints.style}
 

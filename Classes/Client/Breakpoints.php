@@ -1,7 +1,7 @@
 <?php
 namespace RTP\RtpImgquery\Client;
 
-use \TYPO3\CMS\Core\Utility\GeneralUtility as GeneralUtility;
+use RTP\RtpImgquery\Service\Compatibility as Compatibility;
 
 /* ============================================================================
  *
@@ -26,78 +26,38 @@ class Breakpoints
     private $conf;
 
     /**
-     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-     */
-    public $cObj;
-
-    /**
-     * @var int
-     */
-    private $defaultBreakpoint;
-
-    /**
      * @var array
      */
     private $breakpoints;
 
     /**
-     * @var \RTP\RtpImgquery\Main\Width
+     * @var int
      */
     private $defaultWidth;
 
     /**
-     * @param $cObj \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-     * @param $conf
-     * @param $width \RTP\RtpImgquery\Main\Width
+     * @var
      */
-    public function __construct($cObj, $conf, $width)
+    private $defaultBreakpoint;
+
+    /**
+     * @var
+     */
+    private $configuration;
+
+    /**
+     * @param $conf
+     * @param $defaultWidth int
+     * @param $defaultBreakpoint int
+     * @param $configuration string
+     */
+    public function __construct($conf, $defaultWidth, $defaultBreakpoint, $configuration)
     {
         $this->conf = $conf;
-        $this->defaultWidth = $width;
-        $this->cObj = $cObj;
-    }
-
-    /**
-     * Gets the default breakpoint from any of the following sources (in order of priority);
-     * - As configured in the content element
-     * - As configured in TypoScript
-     * - The width of the default image.
-     *
-     * @return int
-     */
-    public function setDefault()
-    {
-        $this->defaultBreakpoint = false;
-
-        if (intval($this->cObj->data['tx_rtpimgquery_breakpoint']) > 0) {
-            $this->defaultBreakpoint = intval($this->cObj->data['tx_rtpimgquery_breakpoint']);
-
-        } elseif (intval($this->conf['breakpoint']) > 0) {
-            $this->defaultBreakpoint = intval($this->conf['breakpoint']);
-
-        } elseif ($this->defaultWidth->has()) {
-            $this->defaultBreakpoint = $this->defaultWidth->get();
-        }
-    }
-
-    /**
-     * Checks for a defined default breakpoint
-     *
-     * @return bool
-     */
-    public function getDefault()
-    {
-        return $this->defaultBreakpoint;
-    }
-
-    /**
-     * Checks for a defined default breakpoint
-     *
-     * @return bool
-     */
-    public function hasDefault()
-    {
-        return (boolean) $this->getDefault();
+        $this->defaultWidth = $defaultWidth;
+        $this->defaultBreakpoint = $defaultBreakpoint;
+        $this->configuration = $configuration;
+        $this->set();
     }
 
     /**
@@ -112,32 +72,22 @@ class Breakpoints
      * Gets the list of defined breakpoints from the configuration sorted in descending order and
      * including the default breakpoint (i.e. the breakpoint for the default image).
      *
+     * The simplest case is that breakpoints are configured as "breakpoints = x, y, z" where
+     * x, y & z are the breakpoints and the breakpoints correspond exactly to the image widths. e.g.
+     * 400, 600, 1000 would define image widths 400, 600 & 1000 for browser widths 400, 600 & 1000
+     * Alternatively the breakpoints can be configure as "breakpoints = x:a, y:b, z:c"
+     * where x, y & z are the breakpoints and a, b, c are the image widths. So 400:600 would define an
+     * image width of 600 at breakpoint 400.
      *
      * @return array
      */
-    public function set()
+    private function set()
     {
-        // The simplest case is that breakpoints are configured as "breakpoints = x, y, z" where
-        // x, y & z are the breakpoints and the breakpoints correspond exactly to the image widths. e.g.
-        // 400, 600, 1000 would define image widths 400, 600 & 1000 for browser widths 400, 600 & 1000
-        // Alternatively the breakpoints can be configure as "breakpoints = x:a, y:b, z:c"
-        // where x, y & z are the breakpoints and a, b, c are the image widths. So 400:600 would define an
-        // image width of 600 at breakpoint 400.
-        if (isset($this->conf['breakpoints']) || $this->cObj->data['tx_rtpimgquery_breakpoints']) {
+        // Create an array of breakpoints
+        $this->breakpoints = Compatibility::trimExplode(',', $this->getConfiguration(), true);
 
-            if ($this->cObj->data['tx_rtpimgquery_breakpoints']) {
-                $this->breakpoints = str_replace(chr(10), ',', $this->cObj->data['tx_rtpimgquery_breakpoints']);
-
-            } else {
-                $this->breakpoints = $this->conf['breakpoints'];
-            }
-
-            // Create an array of breakpoints
-            $this->breakpoints = GeneralUtility::trimExplode(',', $this->breakpoints, true);
-
-            // Converts something like 610:400 to 610 (we are not interested in image widths)
-            $this->breakpoints = array_filter(array_map('intval', $this->breakpoints));
-        }
+        // Converts something like 610:400 to 610 (we are not interested in image widths)
+        $this->breakpoints = array_filter(array_map('intval', $this->breakpoints));
 
         // In addition to or instead of the configuration outlined above, breakpoints can be configured in more
         // detail as "breakpoints.x.file.width = n" where x is the breakpoint n is the corresponding image width.
@@ -146,15 +96,12 @@ class Breakpoints
             $configuredBreakpoints = array_filter(array_map('intval', array_keys($this->conf['breakpoints.'])));
 
             if (is_array($configuredBreakpoints) && !empty($configuredBreakpoints)) {
-                $this->breakpoints = array_merge((array) $this->breakpoints, $configuredBreakpoints);
+                $this->breakpoints = array_merge((array) $this->breakpoints, (array) $configuredBreakpoints);
             }
         }
 
-        // Adds the default breakpoint to the list, but only if the list contains other breakpoints (an
-        // image configuration with a single breakpoint makes no sense!)
-        if (!empty($this->breakpoints)) {
-            $this->breakpoints[] = $this->getDefault();
-        }
+        // Adds the default breakpoint to the list
+        $this->breakpoints[] = $this->defaultBreakpoint;
 
         // Cleans up and sorts the final list of breakpoints
         $this->breakpoints = array_map('intval', array_unique($this->breakpoints));
@@ -168,29 +115,18 @@ class Breakpoints
      */
     public function has()
     {
-        return (boolean) $this->get();
+        return count($this->get()) > 1;
     }
 
     /**
      * Returns the breakpoints settings which is either defined in TypoScript or in the
      * data of the content element.
      *
-     * @return mixed
+     * @return string
      */
-    public function getSettings()
+    public function getConfiguration()
     {
-        static $configuration;
-
-        if (is_null($configuration)) {
-            if ($this->cObj->data['tx_rtpimgquery_breakpoints']) {
-                $configuration = $this->cObj->data['tx_rtpimgquery_breakpoints'];
-
-            } else {
-                $configuration = $this->conf['breakpoints'];
-            }
-        }
-
-        return $configuration;
+        return $this->configuration;
     }
 }
 

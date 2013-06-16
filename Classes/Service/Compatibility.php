@@ -79,22 +79,10 @@ class Compatibility
     public static function getUrl($url, $includeHeader = 0, $requestHeaders = false, &$report = null)
     {
         if (class_exists('\TYPO3\CMS\Core\Utility\GeneralUtility')) {
-            return call_user_func(
-                array('\TYPO3\CMS\Core\Utility\GeneralUtility', 'getUrl'),
-                $url,
-                $includeHeader,
-                $requestHeaders,
-                $report
-            );
+            return \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl($url, $includeHeader, $requestHeaders, &$report);
 
         } else {
-            return call_user_func(
-                array('t3lib_div', 'getUrl'),
-                $url,
-                $includeHeader,
-                $requestHeaders,
-                $report
-            );
+            return \t3lib_div::getUrl($url, $includeHeader, $requestHeaders, &$report);
         }
     }
 
@@ -251,6 +239,27 @@ class Compatibility
         } else {
             return call_user_func(array('t3lib_extMgm', 'extPath'), $key, $script);
         }
+    }
+
+    /**
+     * @param $content
+     * @param $setup
+     * @return mixed
+     */
+    public static function stdWrap($content, $setup)
+    {
+        if (class_exists('\TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController')) {
+            if ($GLOBALS['TSFE']->cObj instanceof \TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController) {
+                return $GLOBALS['TSFE']->cObj->stdWrap($content, $setup);
+            }
+
+        } else {
+            if ($GLOBALS['TSFE']->cObj instanceof \tslib_fe) {
+                return $GLOBALS['TSFE']->cObj->stdWrap($content, $setup);
+            }
+        }
+
+        return $content;
     }
 }
 

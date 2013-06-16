@@ -1,6 +1,8 @@
 <?php
+namespace RTP\RtpImgquery\ViewHelpers;
+
 use \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper as ImageViewHelper;
-use \TYPO3\CMS\Core\Utility\GeneralUtility as GeneralUtility;
+use RTP\RtpImgquery\Service\Compatibility as Compatibility;
 
 /* ============================================================================
  *
@@ -408,7 +410,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
             $this->pixelRatios = array();
 
             if (isset($this->conf['pixelRatios'])) {
-                $this->pixelRatios = GeneralUtility::trimExplode(',', $this->conf['pixelRatios'], true);
+                $this->pixelRatios = Compatibility::trimExplode(',', $this->conf['pixelRatios'], true);
             }
 
             // The default device resolution is 1
@@ -532,6 +534,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
      * @param $fluidStyle
      * @param $pixelRatios
      * @param $layout
+     * @param $strategy
      */
     private function setConf(
         $src,
@@ -545,7 +548,8 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $breakpoint,
         $fluidStyle,
         $pixelRatios,
-        $layout
+        $layout,
+        $strategy
     ) {
         $this->conf['src'] = $src;
         $this->conf['width'] = $width;
@@ -558,7 +562,8 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends Tx_Fluid_ViewHelpers_Im
         $this->conf['breakpoint'] = intval($breakpoint) > 0 ? intval($breakpoint) : false;
         $this->conf['fluidStyle'] = $fluidStyle;
         $this->conf['pixelRatios'] = $pixelRatios;
-        $this->conf['layout'] = $layout;
+        $this->conf['strategy'] = $layout;
+        $this->conf['strategy'] = $strategy;
     }
 
     /*

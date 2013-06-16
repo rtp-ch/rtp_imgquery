@@ -1,9 +1,9 @@
 <?php
 namespace RTP\RtpImgquery\Main;
 
-use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
-use \RTP\RtpImgquery\Utility\Html as Html;
-use \RTP\RtpImgquery\Main\Image as Image;
+use \RTP\RtpImgquery\Service\Compatibility;
+use \RTP\RtpImgquery\Utility\Html;
+use \RTP\RtpImgquery\Main\Image;
 
 /* ============================================================================
  *
@@ -38,33 +38,31 @@ class Width
     private $image;
 
     /**
-     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-     */
-    private $cObj;
-
-    /**
      * @var
      */
     private $width;
 
     /**
      * @param $conf
-     * @param $cObj \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
      * @param $image \RTP\RtpImgquery\Main\Image
      */
-    public function __construct($conf, $cObj, $image)
+    public function __construct($conf, $image)
     {
         $this->conf = $conf;
-        $this->cObj = $cObj;
         $this->image = $image;
+        $this->set();
     }
 
     /**
-     * Gets the height of the default image from file.width of from the img HTML of the default image
+     * Gets the width of the default image from the following sources (in order of priority)
+     * - TypoScript configuration (e.g. file.width)
+     * - width value of the image HTML
+     * - Actual dimensions of the rendered image (getimagesize)
+     * TODO: Get image dimensions from cObj->image object
      *
      * @return int|string
      */
-    public function set()
+    private function set()
     {
         $this->width = $this->getFromConfiguration();
 
@@ -93,10 +91,7 @@ class Width
         $width = false;
 
         if (isset($this->conf['file.']['width'])) {
-            $width = $this->cObj->stdWrap(
-                $this->conf['file.']['width'],
-                $this->conf['file.']['width.']
-            );
+            $width = Compatibility::stdWrap($this->conf['file.']['width'], $this->conf['file.']['width.']);
         }
 
         return $width;
@@ -124,8 +119,11 @@ class Width
     {
         $width = false;
 
-        if ($src = Html::getAttributeValue('img', 'source', $this->image)) {
+        $src = Html::getAttributeValue('img', 'source', $this->image);
+        if ($src) {
+
             $imageSize = getimagesize($src);
+
             if (isset($imageSize[0])) {
                 $width = $imageSize[0];
             }

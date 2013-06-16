@@ -1,7 +1,7 @@
 <?php
 namespace RTP\RtpImgquery\Client;
 
-use \TYPO3\CMS\Core\Utility\GeneralUtility as GeneralUtility;
+use RTP\RtpImgquery\Service\Compatibility as Compatibility;
 
 /* ============================================================================
  *
@@ -56,12 +56,7 @@ class PixelRatios
     /**
      * @var array TypoScript configuration
      */
-    private $conf;
-
-    /**
-     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-     */
-    public $cObj;
+    private $configuration;
 
     /**
      * @var
@@ -69,13 +64,12 @@ class PixelRatios
     private $pixelRatios;
 
     /**
-     * @param $cObj
-     * @param $conf
+     * @param $configuration
      */
-    public function __construct($cObj, $conf)
+    public function __construct($configuration)
     {
-        $this->cObj = $cObj;
-        $this->conf = $conf;
+        $this->configuration = $configuration;
+        $this->set();
     }
 
     /**
@@ -87,26 +81,24 @@ class PixelRatios
     }
 
     /**
+     * Determines if additional pixel ratios (other than the default of 1) have been defined
+     *
+     * @return bool
+     */
+    public function has()
+    {
+        return count($this->get()) > 1;
+    }
+
+    /**
      * Returns an array of configured retina ratios to be used for image generation.
      *
      * @return array list of the configured retina ratios, will always include the default ratio "1"
      */
-    public function set()
+    private function set()
     {
-        if ($this->cObj->data['tx_rtpimgquery_pixel_ratios']) {
-            $this->pixelRatios = GeneralUtility::trimExplode(
-                ',',
-                $this->cObj->data['tx_rtpimgquery_pixel_ratios'],
-                true
-            );
-
-        } else {
-            $this->pixelRatios = GeneralUtility::trimExplode(
-                ',',
-                $this->conf['breakpoints.']['pixelRatios'],
-                true
-            );
-        }
+        // Gets the pixel ratios from a comma separated list
+        $this->pixelRatios = Compatibility::trimExplode(',', $this->configuration);
 
         // The default device resolution of 1 is always set!
         array_unshift($this->pixelRatios, 1);

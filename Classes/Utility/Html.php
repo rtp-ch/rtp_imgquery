@@ -41,9 +41,13 @@ class Html
 
         if (!isset(self::$attributes[$htmlId])) {
 
-            if ($tags = self::getTagsFromHtml($htmlSource)) {
+            $tags = self::getTagsFromHtml($htmlSource);
+            if ($tags) {
+
                 foreach ($tags[0] as $i => $tag) {
-                    if ($attributes = self::getAttributesFromHtml($tag)) {
+
+                    $attributes = self::getAttributesFromHtml($tag);
+                    if ($attributes) {
                         self::$attributes[$htmlId][][$tags[1][$i]] = array_combine($attributes[1], $attributes[2]);
                     }
                 }
@@ -62,6 +66,60 @@ class Html
     }
 
     /**
+     * @param $tag
+     * @param $attribute
+     * @param $html
+     * @param $value
+     * @return mixed
+     */
+    public static function addAttributeToTag($tag, $attribute, $html, $value)
+    {
+        $search = '%<' . $tag . '([^>]+)/?>%im';
+        $replace = '<' . $tag . '$1 ' . $attribute . '="' . $value . '">';
+        return preg_replace($search, $replace, $html);
+    }
+
+    /**
+     * @param $tag
+     * @param $attribute
+     * @param $html
+     * @return mixed
+     */
+    public static function stripAttributeFromTag($tag, $attribute, $html)
+    {
+        if (preg_match('%<' . $tag . '([^>]*)' . $attribute . '\s*=\s*"[^"]+"([^>]*)/?>%im', $html)) {
+            $html = preg_replace(
+                '%<' . $tag . '([^>]*) ' . $attribute . '\s*=\s*"[^"]+"([^>]*)/?>%im',
+                '<' . $tag . '$1$2>',
+                $html
+            );
+        }
+
+        return $html;
+    }
+
+    /**
+     * @param $tag
+     * @param $attribute
+     * @param $html
+     * @param $value
+     * @return mixed
+     */
+    public static function setAttributeValue($tag, $attribute, $html, $value)
+    {
+        if (preg_match('%<' . $tag . '([^>]*)\s+' . $attribute . '\s*=\s*"[^"]+"([^>]*)/?>%im', $html)) {
+            $html = preg_replace(
+                '%<' . $tag . '([^>]*)\s+' . $attribute . '\s*=\s*"([^"]+)"([^>]*)/?>%im',
+                '<' . $tag . '$1' . $attribute . '="' . $value . '"$3>',
+                $html
+            );
+        }
+
+        return $html;
+    }
+
+
+    /**
      * @param $htmlSource
      * @return bool
      */
@@ -73,7 +131,6 @@ class Html
         // Builds a list of attributes by tag
         if (preg_match_all($tagPattern, $htmlSource, $tags)) {
             return $tags;
-
         }
 
         return false;
@@ -95,6 +152,5 @@ class Html
 
         return false;
     }
-
 }
 

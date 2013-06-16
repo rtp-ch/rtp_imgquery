@@ -1,4 +1,7 @@
 <?php
+namespace RTP\RtpImgquery\Xclass;
+
+use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
 
 /* ============================================================================
  *
@@ -404,7 +407,7 @@ if ($this->hasDebug()) {
                         // The default settings are overridden by individual breakpoint TypoScript configurations
                         if ($this->hasBreakpointConfiguration($breakpoint)) {
                             $impliedConfigurations[$breakpoint] =
-                                    t3lib_div::array_merge_recursive_overrule(
+                                    Compatibility::arrayMergeRecursiveOverrule(
                                         $impliedConfigurations[$breakpoint],
                                         $this->breakpointConfiguration($breakpoint)
                                     );
@@ -583,7 +586,7 @@ if ($this->hasDebug()) {
 
                     if (isset($this->conf['breakpoints.'][$breakpoint . '.'])) {
                         $breakpointConfigurations[$breakpoint]['file.'] =
-                            t3lib_div::array_merge_recursive_overrule(
+                            Compatibility::arrayMergeRecursiveOverrule(
                                 (array) $breakpointConfigurations[$breakpoint]['file.'],
                                 (array) $this->conf['breakpoints.'][$breakpoint . '.']['file.']
                             );

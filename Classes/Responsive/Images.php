@@ -2,6 +2,7 @@
 namespace RTP\RtpImgquery\Responsive;
 
 use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
+use \RTP\RtpImgquery\Utility\Html;
 
 /* ============================================================================
  *
@@ -45,32 +46,23 @@ class Images
     private $pixelRatios;
 
     /**
-     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-     */
-    private $cObj;
-
-    /**
-     * @var Style RTP\RtpImgquery\Responsive\Style
+     * @var \RTP\RtpImgquery\Responsive\Style
      */
     private $style;
 
     /**
-     * @var Configuration RTP\RtpImgquery\Responsive\Configuration
+     * @var \RTP\RtpImgquery\Responsive\Configuration
      */
     private $configuration;
 
     /**
-     * @param $conf
-     * @param $cObj \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
      * @param $breakpoints \RTP\RtpImgquery\Client\Breakpoints
      * @param $pixelRatios \RTP\RtpImgquery\Client\PixelRatios
      * @param $configuration \RTP\RtpImgquery\Responsive\Configuration
      * @param $style \RTP\RtpImgquery\Responsive\Style
      */
-    public function __construct($conf, $cObj, $breakpoints, $pixelRatios, $configuration, $style)
+    public function __construct($breakpoints, $pixelRatios, $configuration, $style)
     {
-        $this->conf = $conf;
-        $this->cObj = $cObj;
         $this->breakpoints = $breakpoints;
         $this->pixelRatios = $pixelRatios;
         $this->configuration = $configuration;
@@ -80,39 +72,64 @@ class Images
     /**
      * Creates the images for all breakpoints and returns a list of final image tags per breakpoint.
      *
+     * @param $imageRenderer
      * @return array
      */
-    public function generate()
+    public function generate($imageRenderer)
     {
         $this->images = array();
 
-        // Generates images according to their implied configurations by device pixel ratio and breakpoint
-        if ($this->breakpoints->has()) {
-            foreach ($this->pixelRatios->get() as $pixelRatio) {
-                foreach ($this->breakpoints->get() as $breakpoint) {
+        // Generates images according to their implied configurations by breakpoint
+        foreach ($this->breakpoints->get() as $breakpoint) {
 
-                    // Get the implied typoscript configuration for the breakpoint
-                    $impliedConfiguration = $this->configuration->getForBreakpoint($breakpoint);
+            // Gets the typoscript configuration for the breakpoint
+            $impliedConfiguration = $this->configuration->getForBreakpoint($breakpoint);
 
-                    // Multiply the width/height by pixel ratio to increase the image size.
+            // Generates the corresponding image from the implied typoscript
+            $image = $imageRenderer(
+                $impliedConfiguration['file'],
+                $impliedConfiguration
+            );
+
+            // If set, inserts inline style to make the image fluid (i.e. width/height 100%)
+            if ($this->style->has()) {
+                $image = $this->style->insert($image);
+            }
+
+            // Puts the original image source in the data-src attribute of the generated html
+            $image = Html::addAttributeToTag('img', 'data-src', $image, $impliedConfiguration['file']);
+
+            // Saves the generated image HTML for the breakppoint and the default pixel ratio
+            $this->images[strval(1)][strval($breakpoint)] = $image;
+        }
+
+        // Generate higher resolution versions of the original images for each pixel ratio above 1
+        if ($this->pixelRatios->has()) {
+            foreach ($this->images[strval(1)] as $breakpoint => $image) {
+
+                // Get the source from the data-src attribute of the HTML image
+                $src = Html::getAttributeValue('img', 'data-src', $image);
+
+                foreach ($this->pixelRatios->get() as $pixelRatio) {
                     if ($pixelRatio > 1) {
-                        $impliedConfiguration['file.']['width']  *= $pixelRatio;
-                        $impliedConfiguration['file.']['height'] *= $pixelRatio;
+
+                        $width =  floatval($pixelRatio) * Html::getAttributeValue('img', 'width', $image);
+                        $height = floatval($pixelRatio) * Html::getAttributeValue('img', 'height', $image);
+
+                        $newImage = $imageRenderer(
+                            $src,
+                            array(
+                                'file.' => array(
+                                    'width' => $width,
+                                    'height' => $height
+                                )
+                            )
+                        );
+
+                        $newSrc = Html::getAttributeValue('img', 'src', $newImage);
+                        $modifiedImage = Html::setAttributeValue('img', 'src', $image, $newSrc);
+                        $this->images[strval($pixelRatio)][$breakpoint] = $modifiedImage;
                     }
-
-                    // Generate the corresponding image with the implied typoscript configuration
-                    $image = $this->cObj->cImage(
-                        $impliedConfiguration['file'],
-                        $impliedConfiguration
-                    );
-
-                    // If set, insert inline style to make the image fluid (i.e. width/height 100%)
-                    if ($this->style->has()) {
-                        $image = $this->style->insert($image);
-                    }
-
-                    // Saves the generated image HTML by pixel ratio and breakpoint
-                    $this->images[strval($pixelRatio)][strval($breakpoint)] = $image;
                 }
             }
         }

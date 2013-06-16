@@ -1,8 +1,9 @@
 <?php
 namespace RTP\RtpImgquery\Main;
 
-use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
-use \RTP\RtpImgquery\Utility\Html as Html;
+use \RTP\RtpImgquery\Service\Compatibility;
+use \RTP\RtpImgquery\Utility\Html;
+use \RTP\RtpImgquery\Utility\TypoScript;
 
 /* ============================================================================
  *
@@ -37,33 +38,30 @@ class Height
     private $image;
 
     /**
-     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
-     */
-    private $cObj;
-
-    /**
      * @var
      */
     private $height;
 
     /**
      * @param $conf
-     * @param $cObj \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
      * @param $image \RTP\RtpImgquery\Main\Image
      */
-    public function __construct($conf, $cObj, $image)
+    public function __construct($conf, $image)
     {
         $this->conf = $conf;
-        $this->cObj = $cObj;
         $this->image = $image;
+        $this->set();
     }
 
     /**
-     * Gets the height of the default image from file.height of from the img HTML of the default image
+     * Gets the height of the default image from the following sources (in order of priority)
+     * - TypoScript configuration (e.g. file.height)
+     * - height value of the image HTML
+     * - Actual dimensions of the rendered image (getimagesize)
      *
      * @return null
      */
-    public function set()
+    private function set()
     {
         $this->height = $this->getFromConfiguration();
 
@@ -92,10 +90,7 @@ class Height
         $height = false;
 
         if (isset($this->conf['file.']['height'])) {
-            $height = $this->cObj->stdWrap(
-                $this->conf['file.']['height'],
-                $this->conf['file.']['height.']
-            );
+            $height = Compatibility::stdWrap($this->conf['file.']['height'], $this->conf['file.']['height.']);
         }
 
         return $height;
@@ -123,8 +118,11 @@ class Height
     {
         $height = false;
 
-        if ($src = Html::getAttributeValue('img', 'source', $this->image)) {
+        $src = Html::getAttributeValue('img', 'source', $this->image);
+        if ($src) {
+
             $imageSize = getimagesize($src);
+
             if (isset($imageSize[1])) {
                 $height = $imageSize[1];
             }
