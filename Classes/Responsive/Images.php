@@ -26,9 +26,9 @@ class Images
 {
 
     /**
-     * @var array TypoScript configuration
+     * @var
      */
-    private $conf;
+    private $sources;
 
     /**
      * @var
@@ -83,12 +83,12 @@ class Images
         foreach ($this->breakpoints->get() as $breakpoint) {
 
             // Gets the typoscript configuration for the breakpoint
-            $impliedConfiguration = $this->configuration->getForBreakpoint($breakpoint);
+            $configuration = $this->configuration->getForBreakpoint($breakpoint);
 
             // Generates the corresponding image from the implied typoscript
             $image = $imageRenderer(
-                $impliedConfiguration['file'],
-                $impliedConfiguration
+                $configuration['file'],
+                $configuration
             );
 
             // If set, inserts inline style to make the image fluid (i.e. width/height 100%)
@@ -96,19 +96,18 @@ class Images
                 $image = $this->style->insert($image);
             }
 
-            // Puts the original image source in the data-src attribute of the generated html
-            $image = Html::addAttributeToTag('img', 'data-src', $image, $impliedConfiguration['file']);
-
             // Saves the generated image HTML for the breakppoint and the default pixel ratio
             $this->images[strval(1)][strval($breakpoint)] = $image;
+            // Saves the original source image
+            $this->sources[strval($breakpoint)] = $configuration['file'];
         }
 
         // Generate higher resolution versions of the original images for each pixel ratio above 1
         if ($this->pixelRatios->has()) {
             foreach ($this->images[strval(1)] as $breakpoint => $image) {
 
-                // Get the source from the data-src attribute of the HTML image
-                $src = Html::getAttributeValue('img', 'data-src', $image);
+                // Get the source image for the breakpoint
+                $src = $this->sources[strval($breakpoint)];
 
                 foreach ($this->pixelRatios->get() as $pixelRatio) {
                     if ($pixelRatio > 1) {

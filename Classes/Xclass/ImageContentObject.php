@@ -1,7 +1,7 @@
 <?php
 namespace RTP\RtpImgquery\Xclass;
 
-use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
+use \RTP\RtpImgquery\Service\Compatibility;
 
 /* ============================================================================
  *
@@ -65,7 +65,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
     public $cObj;
 
     /**
-     * @var \RTP\RtpImgquery\Main\Image
+     * @var
      */
     private $defaultImage;
 

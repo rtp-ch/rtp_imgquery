@@ -1,7 +1,7 @@
 <?php
 namespace RTP\RtpImgquery\Utility;
 
-use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
+use \RTP\RtpImgquery\Service\Compatibility;
 
 /* ============================================================================
  *
@@ -110,7 +110,7 @@ class Html
         if (preg_match('%<' . $tag . '([^>]*)\s+' . $attribute . '\s*=\s*"[^"]+"([^>]*)/?>%im', $html)) {
             $html = preg_replace(
                 '%<' . $tag . '([^>]*)\s+' . $attribute . '\s*=\s*"([^"]+)"([^>]*)/?>%im',
-                '<' . $tag . '$1' . $attribute . '="' . $value . '"$3>',
+                '<' . $tag . ' $1' . $attribute . '="' . $value . '"$3>',
                 $html
             );
         }

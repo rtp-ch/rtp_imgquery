@@ -1,7 +1,7 @@
 <?php
 namespace RTP\RtpImgquery\Main;
 
-use RTP\RtpImgquery\Service\Compatibility as Compatibility;
+use RTP\RtpImgquery\Service\Compatibility;
 
 /* ============================================================================
  *

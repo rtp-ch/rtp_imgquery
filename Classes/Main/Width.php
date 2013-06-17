@@ -3,7 +3,6 @@ namespace RTP\RtpImgquery\Main;
 
 use \RTP\RtpImgquery\Service\Compatibility;
 use \RTP\RtpImgquery\Utility\Html;
-use \RTP\RtpImgquery\Main\Image;
 
 /* ============================================================================
  *
