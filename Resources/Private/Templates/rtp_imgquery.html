@@ -12,7 +12,8 @@
     if (!rtp_iQp[###ID###])
     {
         // Gets the current window width, if it hasn't already been defined.
-        rtp_iQp.width = rtp_iQp.width || window.innerWidth;
+        rtp_iQp.width = rtp_iQp.width || window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth || 0;
+
 
         // Images per breakpoint and breakpoints per image/id
         var iQi = rtp_iQp[###ID###] =
