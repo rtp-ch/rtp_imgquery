@@ -4,6 +4,12 @@ php:
    - 5.3
    - 5.4
 
+branches:
+  only:
+    - 2.1
+  exclude:
+    - 1.0.0
+
 env:
    - DB=mysql TYPO3=TYPO3_6-1 INTEGRATION=master
    - DB=mysql TYPO3=TYPO3_6-0 INTEGRATION=master
