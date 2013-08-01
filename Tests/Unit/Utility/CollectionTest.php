@@ -1,5 +1,5 @@
 <?php
-namespace RTP\RtpImgquery\Tests\Service;
+namespace RTP\RtpImgquery\Tests\Utility;
 
 use RTP\RtpImgquery\Utility\Collection;
 
