@@ -79,10 +79,10 @@ class Compatibility
     public static function getUrl($url, $includeHeader = 0, $requestHeaders = false, &$report = null)
     {
         if (class_exists('\TYPO3\CMS\Core\Utility\GeneralUtility')) {
-            return \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl($url, $includeHeader, $requestHeaders, &$report);
+            return \TYPO3\CMS\Core\Utility\GeneralUtility::getUrl($url, $includeHeader, $requestHeaders, $report);
 
         } else {
-            return \t3lib_div::getUrl($url, $includeHeader, $requestHeaders, &$report);
+            return \t3lib_div::getUrl($url, $includeHeader, $requestHeaders, $report);
         }
     }
 
