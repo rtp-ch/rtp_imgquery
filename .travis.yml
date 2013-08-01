@@ -1,17 +1,17 @@
-language:
-  - node_js
-  - php
+language: php
 
 php:
    - 5.3
    - 5.4
 
-node_js:
-  - 0.8
-
 env:
    - DB=mysql TYPO3=TYPO3_6-1 INTEGRATION=master
    - DB=mysql TYPO3=TYPO3_6-0 INTEGRATION=master
+
+matrix:
+  include:
+    - php: 5.5
+      env: DB=mysql TYPO3=master INTEGRATION=master
 
 services:
   - memcached
@@ -24,6 +24,7 @@ before_script:
   - git clone --single-branch --branch $INTEGRATION --depth 1 git://github.com/georgringer/TYPO3-Travis-Integration.git build-environment
   - git clone --single-branch --branch $TYPO3 --depth 1 https://github.com/TYPO3/TYPO3.CMS.git core
   - source build-environment/install-helper.sh
+  - if [[ "$TRAVIS_PHP_VERSION" != "5.5" ]]; then installPhpModule igbinary; fi
   - installPhpModule -y memcache
   - installPhpModule redis
   - if [[ "$TRAVIS_PHP_VERSION" == "5.3" ]]; then installPhpModule -y apc; fi
@@ -45,5 +46,4 @@ before_script:
 
 
 script:
-#  - phpLint all
   - php $PWD/typo3/cli_dispatch.phpsh phpunit -c typo3conf/ext/rtp_imgquery/Tests/Build/UnitTests.xml
