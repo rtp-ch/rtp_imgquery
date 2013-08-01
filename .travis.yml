@@ -35,7 +35,7 @@ before_script:
   - if [[ -d core/t3lib ]]; then mv core/t3lib . ; fi
   - mv build-environment/typo3conf .
   - git clone --single-branch --branch master --depth 1 git://git.typo3.org/TYPO3v4/Extensions/phpunit.git typo3conf/ext/phpunit/
-  - mv news ./typo3conf/ext
+  - mv rtp_imgquery ./typo3conf/ext
   - mkdir fileadmin
   - mkdir uploads
   - if [[ "$DB" == "mysql" ]]; then mysql -e "DROP DATABASE IF EXISTS typo3_test;" -uroot; fi
@@ -43,7 +43,6 @@ before_script:
   - if [[ "$DB" == "mysql" ]]; then mysql -uroot typo3_test < build-environment/Introduction/typo3conf/ext/introduction/Resources/Private/Subpackages/Introduction/Database/introduction.sql; fi
   - if [[ "$DB" == "mysql" && -f build-environment/dbimport/cache_tables.sql ]]; then mysql -uroot typo3_test < build-environment/dbimport/cache_tables.sql; fi
   - if [[ "$DB" == "mysql" && -f  build-environment/dbimport/cli_users.sql ]]; then mysql -uroot typo3_test < build-environment/dbimport/cli_users.sql; fi
-  - if [[ "$DB" == "mysql" && -f  build-environment/dbimport/news.sql ]]; then mysql -uroot typo3_test < build-environment/dbimport/news.sql; fi
 
 
 script:
