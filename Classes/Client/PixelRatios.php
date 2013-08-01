@@ -98,7 +98,7 @@ class PixelRatios
     private function set()
     {
         // Gets the pixel ratios from a comma separated list
-        $this->pixelRatios = Compatibility::trimExplode(',', $this->configuration);
+        $this->pixelRatios = Compatibility::trimExplode($this->configuration, ',');
 
         // The default device resolution of 1 is always set!
         array_unshift($this->pixelRatios, 1);

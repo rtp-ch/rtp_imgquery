@@ -84,7 +84,7 @@ class Breakpoints
     private function set()
     {
         // Create an array of breakpoints
-        $this->breakpoints = Compatibility::trimExplode(',', $this->getConfiguration(), true);
+        $this->breakpoints = Compatibility::trimExplode($this->getConfiguration(), ',', true);
 
         // Converts something like 610:400 to 610 (we are not interested in image widths)
         $this->breakpoints = array_filter(array_map('intval', $this->breakpoints));
