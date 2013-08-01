@@ -29,7 +29,6 @@ class Compatibility
         }
     }
 
-
     /**
      * Returns the absolute filename of a relative reference, resolves the "EXT:" prefix (way of referring to files
      * inside extensions) and checks that the file is inside the PATH_site of the TYPO3 installation and implies a
@@ -165,22 +164,30 @@ class Compatibility
      * @see \t3lib_div::trimExplode
      * @see \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode
      *
-     * @param string $delimiter Delimiter string to explode with
      * @param string $str The string to explode
+     * @param string $delimiter Delimiter string to explode with
      * @param boolean $onlyNonEmptyValues If set (default), all empty values (='') will NOT be set in output
      * @param int $limit If positive, the result will contain a maximum of $limit elements, if negative,
      *        all components except the last -$limit are returned, if zero (default), the result is not limited at all.
      *
      * @return array
      */
-    public static function trimExplode($delimiter, $str, $onlyNonEmptyValues = true, $limit = 0)
+    public static function trimExplode($str, $delimiter = ',', $onlyNonEmptyValues = true, $limit = 0)
     {
         $arr = array();
 
         if (is_string($str)) {
 
-            // Explodes and trims the array
-            $arr = (array) self::trimList(explode($delimiter, $str), $onlyNonEmptyValues);
+            // Explodes the string into an array
+            $arr = explode($delimiter, $str);
+
+            // Trims the array members
+            $arr = (array) self::trimMembers($arr);
+
+            // Strips empty members form the array
+            if ($onlyNonEmptyValues) {
+                $arr = (array) self::stripEmpty($arr);
+            }
 
             // $limit cannot be larger than the number of array members
             $limit = (is_int($limit) && abs($limit) < count($arr)) ? $limit : 0;
@@ -189,7 +196,7 @@ class Compatibility
             if ($limit > 0) {
                 $arr =  array_slice($arr, 0, $limit);
 
-            } elseif($limit < 0) {
+            } elseif ($limit < 0) {
                 $arr = array_slice($arr, $limit);
             }
         }
@@ -198,23 +205,42 @@ class Compatibility
     }
 
     /**
-     * Trims members of and optionally strips empty members from an array.
+     * Trims members of an array.
      *
      * @static
      * @param array $arr
-     * @param boolean $onlyNonEmptyValues
      *
      * @return array
      */
-    public static function trimList($arr, $onlyNonEmptyValues = true)
+    public static function trimMembers($arr)
     {
-        $trimList = array_map('trim', $arr);
+        return array_map(function ($item) {
+            return is_string($item) ? trim($item) : $item;
+        }, $arr);
+    }
 
-        if ($onlyNonEmptyValues) {
-            $trimList = array_filter($trimList, 'strlen');
-        }
+    /**
+     * Removes empty members form an array.
+     *
+     * @param $arr
+     * @return array
+     */
+    public static function stripEmpty($arr)
+    {
+        return array_filter($arr, function ($item) {
+            if (is_string($item)) {
+                return strlen($item) > 0;
 
-        return $trimList;
+            } elseif (is_null($item)) {
+                return false;
+
+            } elseif (is_array($item)) {
+                return !empty($item);
+            }
+
+            // All other items (including booleans, e.g. "false") are not removed.
+            return true;
+        });
     }
 
     /**
