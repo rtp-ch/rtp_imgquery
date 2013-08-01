@@ -11,6 +11,7 @@ return array(
     'Tx_RtpImgQuery_Responsive_Style' => 'RTP\RtpImgquery\Responsive\Style',
     'Tx_RtpImgQuery_imgQuery' => 'RTP\RtpImgquery\imgQuery',
     'Tx_RtpImgQuery_Service_Compatibility' => 'RTP\RtpImgquery\Service\Compatibility',
+    'Tx_RtpImgQuery_Utility_Collection' => 'RTP\RtpImgquery\Utility\Collection',
     'Tx_RtpImgQuery_Utility_Html' => 'RTP\RtpImgquery\Utility\Html',
     'Tx_RtpImgQuery_Utility_TypoScript' => 'RTP\RtpImgquery\Utility\TypoScript',
     'Tx_RtpImgQuery_ViewHelpers_ImageViewHelper' => 'RTP\RtpImgquery\ViewHelpers\ImageViewHelper',

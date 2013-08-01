@@ -46,4 +46,5 @@ before_script:
 
 
 script:
+  - grunt
   - php $PWD/typo3/cli_dispatch.phpsh phpunit typo3conf/ext/rtp_imgquery/Tests/
