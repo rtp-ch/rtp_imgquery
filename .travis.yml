@@ -44,5 +44,5 @@ before_script:
 
 
 script:
-  - phpcs --standard=PSR2 --report=summary --ignore=class.ux_tslib_content_image.php,ImageViewHelper.php Classes/
+  - phpcs --standard=PSR2 --report=summary --ignore=class.ux_tslib_content_image.php,ImageViewHelper.php typo3conf/ext/rtp_imgquery/Classes/
   - php $PWD/typo3/cli_dispatch.phpsh phpunit typo3conf/ext/rtp_imgquery/Tests/
