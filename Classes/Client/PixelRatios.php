@@ -2,6 +2,7 @@
 namespace RTP\RtpImgquery\Client;
 
 use RTP\RtpImgquery\Service\Compatibility;
+use RTP\RtpImgquery\Utility\Collection;
 
 /* ============================================================================
  *
@@ -98,7 +99,7 @@ class PixelRatios
     private function set()
     {
         // Gets the pixel ratios from a comma separated list
-        $this->pixelRatios = Compatibility::trimExplode($this->configuration, ',');
+        $this->pixelRatios = Collection::trimExplode($this->configuration, ',');
 
         // The default device resolution of 1 is always set!
         array_unshift($this->pixelRatios, 1);
