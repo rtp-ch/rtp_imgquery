@@ -3,6 +3,7 @@
 // loads compatibility functions
 require_once __DIR__ . '/Classes/Service/Compatibility.php';
 
+
 $extensionPath = \RTP\RtpImgquery\Service\Compatibility::extPath('rtp_imgquery');
 $extensionClassesPath = $extensionPath . 'Classes/';
 
@@ -18,7 +19,10 @@ return array(
     'tx_rtpimgquery_responsive_strategy' => $extensionClassesPath . 'Responsive/Strategy.php',
     'tx_rtpimgquery_responsive_style' => $extensionClassesPath . 'Responsive/Style.php',
     'tx_rtpimgquery_service_compatibility' => $extensionClassesPath . 'Service/Compatibility.php',
-    //'RTP\\RtpImgquery\\Utility\\Collection' => $extensionClassesPath . 'Utility/Collection.php',
+    'RTP\RtpImgquery\Utility\Collection' => $extensionClassesPath . 'Utility/Collection.php',
+    '\RTP\RtpImgquery\Utility\Collection' => $extensionClassesPath . 'Utility/Collection.php',
+    'Collection' => $extensionClassesPath . 'Utility/Collection.php',
+    'tx_rtpimgquery_utility_collection' => $extensionClassesPath . 'Utility/Collection.php',
     'tx_rtpimgquery_utility_html' => $extensionClassesPath . 'Utility/Html.php',
     'tx_rtpimgquery_utility_typoscript' => $extensionClassesPath . 'Utility/TypoScript.php',
     'tx_rtpimgquery_xclass_imagecontentobject' => $extensionClassesPath . 'Xclass/ImageContentObject.php',

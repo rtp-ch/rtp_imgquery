@@ -12,8 +12,6 @@ services:
   - memcached
 
 before_script:
-# Install Grunt
-  #- npm install grunt-cli
 # Install build dependencies
   - cd ..
   - git clone --single-branch --branch $INTEGRATION --depth 1 git://github.com/rtp-ch/TYPO3-Travis-Integration.git build-environment
