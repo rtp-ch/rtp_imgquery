@@ -1,8 +1,6 @@
 <?php
 namespace RTP\RtpImgquery\Responsive;
 
-use \RTP\RtpImgquery\Service\Compatibility;
-
 /* ============================================================================
  *
  * This script is part of the rtp_imgquery extension ("responsive
@@ -16,7 +14,6 @@ use \RTP\RtpImgquery\Service\Compatibility;
  *
  * ============================================================================
  */
-
 
 class Style
 {
@@ -148,4 +145,3 @@ class Style
         return (boolean) $this->get();
     }
 }
-

@@ -138,4 +138,3 @@ class Height
         return (boolean) $this->get();
     }
 }
-

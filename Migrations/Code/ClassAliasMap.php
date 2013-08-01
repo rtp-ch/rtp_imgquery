@@ -9,7 +9,7 @@ return array(
     'Tx_RtpImgQuery_Responsive_Images' => 'RTP\RtpImgquery\Responsive\Images',
     'Tx_RtpImgQuery_Responsive_Strategy' => 'RTP\RtpImgquery\Responsive\Strategy',
     'Tx_RtpImgQuery_Responsive_Style' => 'RTP\RtpImgquery\Responsive\Style',
-    'Tx_RtpImgQuery_imgQuery' => 'RTP\RtpImgquery\imgQuery',
+    'Tx_RtpImgQuery_ImgQuery' => 'RTP\RtpImgquery\ImgQuery',
     'Tx_RtpImgQuery_Service_Compatibility' => 'RTP\RtpImgquery\Service\Compatibility',
     'Tx_RtpImgQuery_Utility_Collection' => 'RTP\RtpImgquery\Utility\Collection',
     'Tx_RtpImgQuery_Utility_Html' => 'RTP\RtpImgquery\Utility\Html',

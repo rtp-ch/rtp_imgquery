@@ -1,8 +1,6 @@
 <?php
 namespace RTP\RtpImgquery\Main;
 
-use RTP\RtpImgquery\Service\Compatibility;
-
 /* ============================================================================
  *
  * This script is part of the rtp_imgquery extension ("responsive
@@ -72,4 +70,3 @@ class Breakpoint
         return (boolean) $this->get();
     }
 }
-

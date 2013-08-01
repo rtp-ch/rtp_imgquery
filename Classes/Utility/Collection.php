@@ -28,11 +28,12 @@ class Collection
      * @see \t3lib_div::trimExplode
      * @see \TYPO3\CMS\Core\Utility\GeneralUtility::trimExplode
      *
-     * @param string $str The string to explode
-     * @param string $delimiter Delimiter string to explode with
+     * @param string  $str                The string to explode
+     * @param string  $delimiter          Delimiter string to explode with
      * @param boolean $onlyNonEmptyValues If set (default), all empty values (='') will NOT be set in output
-     * @param int $limit If positive, the result will contain a maximum of $limit elements, if negative,
-     *        all components except the last -$limit are returned, if zero (default), the result is not limited at all.
+     * @param int     $limit              If positive, the result will contain a maximum of $limit elements,
+     *        if negative, all components except the last -$limit are returned, if zero (default), the result is
+     *        not limited at all.
      *
      * @return array
      */
@@ -71,14 +72,17 @@ class Collection
     /**
      * Trims members of an array which are strings
      *
-     * @param array $arr
+     * @param  array $arr
      * @return array
      */
     public static function trimMembers($arr)
     {
-        return array_map(function ($item) {
-            return is_string($item) ? trim($item) : $item;
-        }, $arr);
+        return array_map(
+            function ($item) {
+                return is_string($item) ? trim($item) : $item;
+            },
+            $arr
+        );
     }
 
     /**
@@ -89,19 +93,22 @@ class Collection
      */
     public static function stripEmpty($arr)
     {
-        return array_filter($arr, function ($item) {
-            if (is_string($item)) {
-                return strlen($item) > 0;
+        return array_filter(
+            $arr,
+            function ($item) {
+                if (is_string($item)) {
+                    return strlen($item) > 0;
 
-            } elseif (is_null($item)) {
-                return false;
+                } elseif (is_null($item)) {
+                    return false;
 
-            } elseif (is_array($item)) {
-                return !empty($item);
+                } elseif (is_array($item)) {
+                    return !empty($item);
+                }
+
+                // All other items (including booleans, e.g. "false") are not removed.
+                return true;
             }
-
-            // All other items (including booleans, e.g. "false") are not removed.
-            return true;
-        });
+        );
     }
 }

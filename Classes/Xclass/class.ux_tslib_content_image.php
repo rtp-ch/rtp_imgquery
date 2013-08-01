@@ -49,7 +49,7 @@ use \RTP\RtpImgquery\Service\Compatibility;
  * @link https://github.com/rtp-ch/rtp_imgquery
  * @todo: Refactor & merge with view helper methods.
  */
-class ux_tslib_content_Image extends tslib_content_Image
+class class.ux_tslib_content_image extends tslib_content_Image
 {
     /**
      * Registry retains information about generated images
@@ -102,7 +102,7 @@ class ux_tslib_content_Image extends tslib_content_Image
      * Rendering the cObject, IMAGE
      *
      * @param    array        Array of TypoScript properties
-     * @return    string        Output
+     * @return string Output
      */
     public function render($conf = array())
     {
@@ -158,10 +158,10 @@ if ($this->hasDebug()) {
         '================'  => '================',
     ));
 }
+
             return $imageHtml;
         }
     }
-
 
     /*
      * ========================================================
@@ -184,6 +184,7 @@ if ($this->hasDebug()) {
         } else {
             $responsiveImage = $this->defaultImage();
         }
+
         return $responsiveImage;
     }
 
@@ -213,6 +214,7 @@ if ($this->hasDebug()) {
             }
             $this->registry[$this->id]['style'] = $style;
         }
+
         return $this->registry[$this->id]['style'];
     }
 
@@ -252,6 +254,7 @@ if ($this->hasDebug()) {
         } else {
             $attribute = null;
         }
+
         return $attribute;
 
     }
@@ -274,6 +277,7 @@ if ($this->hasDebug()) {
                 }
             }
         }
+
         return $this->registry[$this->id]['attributes'];
     }
 
@@ -293,6 +297,7 @@ if ($this->hasDebug()) {
         if (!isset($this->registry[$this->id]['defaultImage'])) {
             $this->registry[$this->id]['defaultImage'] = $this->cObj->cImage($this->conf['file'], $this->conf);
         }
+
         return $this->registry[$this->id]['defaultImage'];
     }
 
@@ -310,6 +315,7 @@ if ($this->hasDebug()) {
         } else {
             $image = null;
         }
+
         return $image;
     }
 
@@ -338,6 +344,7 @@ if ($this->hasDebug()) {
                 }
             }
         }
+
         return $this->registry[$this->id]['images'];
     }
 
@@ -376,6 +383,7 @@ if ($this->hasDebug()) {
         } else {
             $impliedConfiguration = null;
         }
+
         return $impliedConfiguration;
     }
 
@@ -430,7 +438,6 @@ if ($this->hasDebug()) {
         return $this->registry[$this->id]['impliedConfigurations'];
     }
 
-
     /*
      * ========================================================
      * Image dimensions
@@ -440,12 +447,13 @@ if ($this->hasDebug()) {
     /**
      * Modifies the default image height based on the default width and the given breakpoint.
      *
-     * @param string $width
+     * @param  string $width
      * @return string
      */
     private function modifiedHeight($width)
     {
         $height = floor(intval($width) / intval($this->defaultWidth()) * intval($this->defaultHeight()));
+
         return preg_replace('/\d+/', $height, $this->defaultHeight());
     }
 
@@ -469,6 +477,7 @@ if ($this->hasDebug()) {
             }
             $this->registry[$this->id]['defaultHeight'] = $defaultHeight;
         }
+
         return $this->registry[$this->id]['defaultHeight'];
     }
 
@@ -482,6 +491,7 @@ if ($this->hasDebug()) {
     private function modifiedWidth($breakpoint)
     {
         $breakpointWidth = floor(($breakpoint / $this->defaultBreakpoint()) * intval($this->defaultWidth()));
+
         return preg_replace('/^\d+/', $breakpointWidth, $this->defaultWidth());
     }
 
@@ -504,6 +514,7 @@ if ($this->hasDebug()) {
             }
             $this->registry[$this->id]['defaultWidth'] = $defaultWidth;
         }
+
         return $this->registry[$this->id]['defaultWidth'];
     }
 
@@ -551,6 +562,7 @@ if ($this->hasDebug()) {
         } else {
             $breakpointConfiguration = null;
         }
+
         return $breakpointConfiguration;
     }
 
@@ -636,6 +648,7 @@ if ($this->hasDebug()) {
                 $this->registry[$this->id]['defaultBreakpoint'] = intval($this->defaultWidth());
             }
         }
+
         return $this->registry[$this->id]['defaultBreakpoint'];
     }
 
@@ -724,6 +737,7 @@ if ($this->hasDebug()) {
         if (!isset($this->layoutContent[$this->layout()])) {
             $this->layoutContent[$this->layout()] = t3lib_div::getURL($this->layout());
         }
+
         return $this->layoutContent[$this->layout()];
     }
 
@@ -743,6 +757,7 @@ if ($this->hasDebug()) {
                 }
             }
         }
+
         return $this->registry[$this->id]['layout'];
     }
 
@@ -764,6 +779,7 @@ if ($this->hasDebug()) {
                 '###ID###'                  => json_encode($this->id())
             );
         }
+
         return $this->registry[$this->id]['markers'];
     }
 }

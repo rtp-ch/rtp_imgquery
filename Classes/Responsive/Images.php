@@ -1,7 +1,6 @@
 <?php
 namespace RTP\RtpImgquery\Responsive;
 
-use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
 use \RTP\RtpImgquery\Utility\Html;
 
 /* ============================================================================
@@ -150,4 +149,3 @@ class Images
         return (boolean) $this->get();
     }
 }
-

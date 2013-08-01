@@ -1,8 +1,6 @@
 <?php
 namespace RTP\RtpImgquery\Utility;
 
-use \RTP\RtpImgquery\Service\Compatibility;
-
 /* ============================================================================
  *
  * This script is part of the rtp_imgquery extension ("responsive
@@ -76,6 +74,7 @@ class Html
     {
         $search = '%<' . $tag . '([^>]+)/?>%im';
         $replace = '<' . $tag . '$1 ' . $attribute . '="' . $value . '">';
+
         return preg_replace($search, $replace, $html);
     }
 
@@ -118,7 +117,6 @@ class Html
         return $html;
     }
 
-
     /**
      * @param $htmlSource
      * @return bool
@@ -153,4 +151,3 @@ class Html
         return false;
     }
 }
-

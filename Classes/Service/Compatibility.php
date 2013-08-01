@@ -1,6 +1,5 @@
 <?php
 namespace RTP\RtpImgquery\Service;
-use RTP\RtpImgquery\Utility\Collection;
 
 /**
  * Class Compatibility
@@ -36,7 +35,7 @@ class Compatibility
      * check with \TYPO3\CMS\Core\Utility\GeneralUtility::validPathStr(). Returns FALSE if checks failed.
      * Does not check if the file exists.
      *
-     * @param string $filename The input filename/filepath to evaluate
+     * @param string  $filename     The input filename/filepath to evaluate
      * @param boolean $onlyRelative If $onlyRelative is set (which it is by default), then only return values relative
      *        to the current PATH_site is accepted.
      * @param boolean $relToTYPO3_mainDir If $relToTYPO3_mainDir is set, then relative paths are relative to PATH_typo3
@@ -68,11 +67,11 @@ class Compatibility
      * If you are having trouble with proxys when reading URLs you can configure your way out of that with settings
      * like $GLOBALS['TYPO3_CONF_VARS']['SYS']['curlUse'] etc.
      *
-     * @param string $url File/URL to read
+     * @param string  $url           File/URL to read
      * @param integer $includeHeader Whether the HTTP header should be fetched or not. 0=disable, 1=fetch
      * header+content, 2=fetch header only
      * @param array|bool $requestHeaders HTTP headers to be used in the request
-     * @param array $report Error code/message and, if $includeHeader is 1, response meta data
+     * @param array      $report         Error code/message and, if $includeHeader is 1, response meta data
      * (HTTP status and content type)
      * @return mixed The content from the resource given as input. FALSE if an error has occured.
      */
@@ -92,8 +91,8 @@ class Compatibility
      * ($arr0) with the values of the second array ($arr1)
      * In case of identical keys, ie. keeping the values of the second.
      *
-     * @param array $arr0 First array
-     * @param array $arr1 Second array, overruling the first array
+     * @param array   $arr0       First array
+     * @param array   $arr1       Second array, overruling the first array
      * @param boolean $notAddKeys If set, keys that are NOT found in $arr0 (first array) will not be set.
      * Thus only existing value can/will be overruled from second array.
      * @param boolean $includeEmptyValues If set, values from $arr1 will overrule if they are
@@ -142,8 +141,8 @@ class Compatibility
      * \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance('myClass', $arg1, $arg2, ..., $argN)
      *
      * @throws \InvalidArgumentException if classname is an empty string
-     * @param string $class name of the class to instantiate, must not be empty
-     * @return object the created instance
+     * @param  string                    $class name of the class to instantiate, must not be empty
+     * @return object                    the created instance
      */
     public static function makeInstance($class)
     {
@@ -204,4 +203,3 @@ class Compatibility
         return $content;
     }
 }
-

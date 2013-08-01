@@ -1,7 +1,6 @@
 <?php
 namespace RTP\RtpImgquery\Client;
 
-use RTP\RtpImgquery\Service\Compatibility;
 use RTP\RtpImgquery\Utility\Collection;
 
 /* ============================================================================
@@ -109,4 +108,3 @@ class PixelRatios
         sort($this->pixelRatios);
     }
 }
-

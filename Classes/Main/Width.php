@@ -139,4 +139,3 @@ class Width
         return (boolean) $this->get();
     }
 }
-

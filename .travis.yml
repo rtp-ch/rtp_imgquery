@@ -24,6 +24,7 @@ before_script:
   - installPhpModule -y memcache
   - installPhpModule redis
   - if [[ "$TRAVIS_PHP_VERSION" == "5.3" ]]; then installPhpModule -y apc; fi
+  - pyrus install pear/PHP_CodeSniffer
 
 # Install rudimentary TYPO3
   - git clone --single-branch --branch $TYPO3 --depth 1 git://git.typo3.org/TYPO3v4/Distributions/Introduction.git build-environment/Introduction
@@ -34,7 +35,6 @@ before_script:
   - mv rtp_imgquery ./typo3conf/ext
   - mkdir fileadmin
   - mkdir uploads
-  - cat typo3conf/LocalConfiguration.php;
   - if [[ "$DB" == "mysql" ]]; then mysql -e "DROP DATABASE IF EXISTS typo3_test;" -uroot; fi
   - if [[ "$DB" == "mysql" ]]; then mysql -e "create database IF NOT EXISTS typo3_test;" -uroot; fi
   - if [[ "$DB" == "mysql" ]]; then mysql -uroot typo3_test < build-environment/Introduction/typo3conf/ext/introduction/Resources/Private/Subpackages/Introduction/Database/introduction.sql; fi
@@ -43,4 +43,5 @@ before_script:
 
 
 script:
+  - phpcs --ignore=class.ux_tslib_content_image.php,ImageViewHelper.php Classes/
   - php $PWD/typo3/cli_dispatch.phpsh phpunit typo3conf/ext/rtp_imgquery/Tests/

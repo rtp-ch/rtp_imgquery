@@ -127,7 +127,7 @@ class Configuration
     /**
      * Calculates the height for a given width based on the ratio between the default width and height
      *
-     * @param string $width
+     * @param  string     $width
      * @return int|string
      */
     public function getHeightForWidth($width)
@@ -144,4 +144,3 @@ class Configuration
         return $height;
     }
 }
-

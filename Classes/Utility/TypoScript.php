@@ -1,8 +1,6 @@
 <?php
 namespace RTP\RtpImgquery\Utility;
 
-use \RTP\RtpImgquery\Service\Compatibility;
-
 /* ============================================================================
  *
  * This script is part of the rtp_imgquery extension ("responsive
@@ -64,4 +62,3 @@ class TypoScript
         return $configuration;
     }
 }
-

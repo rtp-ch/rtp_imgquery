@@ -50,7 +50,7 @@ use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
  * @author  Simon Tuck <stu@rtp.ch>
  * @link https://github.com/rtp-ch/rtp_imgquery
  */
-class imgQuery
+class ImgQuery
 {
     /**
      * TypoScript configuration
@@ -237,4 +237,3 @@ class imgQuery
         return (boolean) $this->get();
     }
 }
-

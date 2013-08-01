@@ -116,7 +116,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
 
             // Gets an instance of the img query class
             $this->imgQuery = Compatibility::makeInstance(
-                '\RTP\RtpImgquery\imgQuery',
+                '\RTP\RtpImgquery\ImgQuery',
                 $conf,
                 $this->defaultImage,
                 $defaultBreakpoint,
@@ -152,4 +152,3 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
         }
     }
 }
-

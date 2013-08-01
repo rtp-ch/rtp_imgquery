@@ -67,18 +67,18 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends ImageViewHelper
     private $defaultImage;
 
     /**
-     * @param string $src
-     * @param null $width
-     * @param null $height
-     * @param null $minWidth
-     * @param null $minHeight
-     * @param null $maxWidth
-     * @param null $maxHeight
-     * @param null $breakpoints
-     * @param null $breakpoint
-     * @param null $fluidStyle
-     * @param null $pixelRatios
-     * @param null $layout
+     * @param  string $src
+     * @param  null   $width
+     * @param  null   $height
+     * @param  null   $minWidth
+     * @param  null   $minHeight
+     * @param  null   $maxWidth
+     * @param  null   $maxHeight
+     * @param  null   $breakpoints
+     * @param  null   $breakpoint
+     * @param  null   $fluidStyle
+     * @param  null   $pixelRatios
+     * @param  null   $layout
      * @return string
      */
     public function render(
@@ -112,7 +112,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends ImageViewHelper
 
         // Gets an instance of the img query class
         $this->imgQuery = Compatibility::makeInstance(
-            '\RTP\RtpImgquery\imgQuery',
+            '\RTP\RtpImgquery\ImgQuery',
             $conf,
             $defaultImage,
             $breakpoint,
@@ -214,4 +214,3 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends ImageViewHelper
         return $this->defaultImage;
     }
 }
-

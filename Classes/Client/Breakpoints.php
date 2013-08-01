@@ -1,7 +1,6 @@
 <?php
 namespace RTP\RtpImgquery\Client;
 
-use RTP\RtpImgquery\Service\Compatibility;
 use RTP\RtpImgquery\Utility\Collection;
 
 /* ============================================================================
@@ -130,4 +129,3 @@ class Breakpoints
         return $this->configuration;
     }
 }
-
