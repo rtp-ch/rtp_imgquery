@@ -34,6 +34,7 @@ before_script:
   - mv rtp_imgquery ./typo3conf/ext
   - mkdir fileadmin
   - mkdir uploads
+  - cat typo3conf/LocalConfiguration.php;
   - if [[ "$DB" == "mysql" ]]; then mysql -e "DROP DATABASE IF EXISTS typo3_test;" -uroot; fi
   - if [[ "$DB" == "mysql" ]]; then mysql -e "create database IF NOT EXISTS typo3_test;" -uroot; fi
   - if [[ "$DB" == "mysql" ]]; then mysql -uroot typo3_test < build-environment/Introduction/typo3conf/ext/introduction/Resources/Private/Subpackages/Introduction/Database/introduction.sql; fi
