@@ -5,13 +5,6 @@ use RTP\RtpImgquery\Utility\Collection;
 
 class CollectionTest extends \Tx_Phpunit_TestCase
 {
-    /**
-     * @test
-     */
-    public function testIsExtensionInstalled()
-    {
-        $this->assertTrue(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('rtp_imgquery'));
-    }
 
     /**
      * @test
@@ -21,7 +14,7 @@ class CollectionTest extends \Tx_Phpunit_TestCase
      */
     public function testArrayValuesAreTrimmed($actual, $expected)
     {
-        //$this->assertEquals($expected, Collection::trimMembers($actual));
+        $this->assertEquals($expected, Collection::trimMembers($actual));
     }
 
     /**
@@ -57,7 +50,7 @@ class CollectionTest extends \Tx_Phpunit_TestCase
      */
     public function testArrayValuesAreStripped($actual, $expected)
     {
-        //$this->assertEquals($expected, Collection::stripEmpty($actual));
+        $this->assertEquals($expected, Collection::stripEmpty($actual));
     }
 
     /**
@@ -104,7 +97,7 @@ class CollectionTest extends \Tx_Phpunit_TestCase
         $onlyNonEmptyValues = true,
         $limit = 0
     ) {
-        //$this->assertEquals($expected, Collection::trimExplode($actual, $delimiter, $onlyNonEmptyValues, $limit));
+        $this->assertEquals($expected, Collection::trimExplode($actual, $delimiter, $onlyNonEmptyValues, $limit));
     }
 
     /**
