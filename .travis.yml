@@ -16,7 +16,7 @@ before_script:
   #- npm install grunt-cli
 # Install build dependencies
   - cd ..
-  - git clone --single-branch --branch $INTEGRATION --depth 1 git://github.com/georgringer/TYPO3-Travis-Integration.git build-environment
+  - git clone --single-branch --branch $INTEGRATION --depth 1 git://github.com/rtp-ch/TYPO3-Travis-Integration.git build-environment
   - git clone --single-branch --branch $TYPO3 --depth 1 https://github.com/TYPO3/TYPO3.CMS.git core
   - source build-environment/install-helper.sh
   - installPhpModule -y memcache
