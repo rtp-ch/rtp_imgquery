@@ -7,6 +7,14 @@ class CollectionTest extends \Tx_Phpunit_TestCase
 {
     /**
      * @test
+     */
+    public function testIsExtensionInstalled()
+    {
+        $this->assertTrue(\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::isLoaded('rtp_imgquery'));
+    }
+
+    /**
+     * @test
      * @dataProvider arrayValuesAreTrimmedDataProvider
      * @param $actual
      * @param $expected
