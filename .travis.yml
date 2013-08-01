@@ -24,7 +24,6 @@ before_script:
   - git clone --single-branch --branch $INTEGRATION --depth 1 git://github.com/georgringer/TYPO3-Travis-Integration.git build-environment
   - git clone --single-branch --branch $TYPO3 --depth 1 https://github.com/TYPO3/TYPO3.CMS.git core
   - source build-environment/install-helper.sh
-  - if [[ "$TRAVIS_PHP_VERSION" != "5.5" ]]; then installPhpModule igbinary; fi
   - installPhpModule -y memcache
   - installPhpModule redis
   - if [[ "$TRAVIS_PHP_VERSION" == "5.3" ]]; then installPhpModule -y apc; fi
