@@ -65,7 +65,7 @@ class ImgQuery
     public $cObj;
 
     /**
-     * @var \RTP\RtpImgquery\Main\Image
+     * @var string Default image as rendered by cObj
      */
     private $defaultImage;
 
