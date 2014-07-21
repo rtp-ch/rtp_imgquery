@@ -5,7 +5,7 @@ if (!defined('TYPO3_MODE')) {
 }
 
 // No TypoScript to add!
-t3lib_extMgm::addStaticFile('rtp_imgquery', 'Configuration/TypoScript/', 'Responsive Images');
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addStaticFile('rtp_imgquery', 'Configuration/TypoScript/', 'Responsive Images');
 
 // Language labels
 $langFile = 'LLL:EXT:rtp_imgquery/Resources/Private/Language/locallang_db.xml:';
@@ -44,18 +44,17 @@ $tempColumns = array (
         )
     ),
 );
-t3lib_div::loadTCA('tt_content');
-t3lib_extMgm::addTCAcolumns('tt_content', $tempColumns, 1);
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTCAcolumns('tt_content', $tempColumns, 1);
 
 // Creates a new palette "breakpoints"
 $paletteFields  = 'tx_rtpimgquery_breakpoint;' . $breakpointLangLabel;
 $paletteFields .= ', --linebreak--, tx_rtpimgquery_breakpoints;' . $breakpointLangLabels;
 $paletteFields .= ', --linebreak--, tx_rtpimgquery_pixel_ratios;' . $pixelRatioLangLabels;
-t3lib_extMgm::addFieldsToPalette('tt_content', 'breakpoints', $paletteFields);
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addFieldsToPalette('tt_content', 'breakpoints', $paletteFields);
 
 // TODO: Insert the new palette after the palette image_accessibility
 $insertFields   = '--palette--;' . $paletteLangLabels . ';breakpoints';
 $insertTypes    = 'image,textpic';
 // This doesn't seem to work...
 $insertPosition = 'after:palette.image_accessibility;image_accessibility,';
-t3lib_extMgm::addToAllTCAtypes('tt_content', $insertFields, $insertTypes, $insertPosition);
+\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addToAllTCAtypes('tt_content', $insertFields, $insertTypes, $insertPosition);

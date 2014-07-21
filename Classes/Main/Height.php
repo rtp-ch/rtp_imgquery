@@ -1,8 +1,8 @@
 <?php
 namespace RTP\RtpImgquery\Main;
 
-use \RTP\RtpImgquery\Service\Compatibility;
 use \RTP\RtpImgquery\Utility\Html;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /* ============================================================================
  *
@@ -32,18 +32,18 @@ class Height
     private $conf;
 
     /**
-     * @var \RTP\RtpImgquery\Main\Image
+     * @var string
      */
     private $image;
 
     /**
-     * @var
+     * @var string|int
      */
     private $height;
 
     /**
-     * @param $conf
-     * @param $image \RTP\RtpImgquery\Main\Image
+     * @param array  $conf
+     * @param string $image
      */
     public function __construct($conf, $image)
     {
@@ -86,10 +86,13 @@ class Height
      */
     public function getFromConfiguration()
     {
+        /* @var TypoScriptFrontendController $TSFE */
+        global $TSFE;
+
         $height = false;
 
         if (isset($this->conf['file.']['height'])) {
-            $height = Compatibility::stdWrap($this->conf['file.']['height'], $this->conf['file.']['height.']);
+            $height = $TSFE->cObj->stdWrap($this->conf['file.']['height'], $this->conf['file.']['height.']);
         }
 
         return $height;

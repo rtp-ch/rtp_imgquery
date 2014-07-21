@@ -1,7 +1,11 @@
 <?php
 namespace RTP\RtpImgquery\Xclass;
 
-use \RTP\RtpImgquery\Service\Compatibility;
+use TYPO3\CMS\Core\Utility\DebugUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Utility\ArrayUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
+use TYPO3\CMS\Frontend\ContentObject\ImageContentObject;
 
 /* ============================================================================
  *
@@ -49,7 +53,7 @@ use \RTP\RtpImgquery\Service\Compatibility;
  * @link https://github.com/rtp-ch/rtp_imgquery
  * @todo: Refactor & merge with view helper methods.
  */
-class class.ux_tslib_content_image extends tslib_content_Image
+class ux_tslib_content_image extends ImageContentObject
 {
     /**
      * Registry retains information about generated images
@@ -94,7 +98,7 @@ class class.ux_tslib_content_image extends tslib_content_Image
     private $id                         = null;
 
     /**
-     * @var tslib_content
+     * @var ContentObjectRenderer
      */
     public $cObj;
 
@@ -115,7 +119,7 @@ class class.ux_tslib_content_image extends tslib_content_Image
         if ($this->cObj->checkif ($conf['if.'])) {
 
 if ($this->hasDebug()) {
-    t3lib_utility_Debug::debugInPopUpWindow(array(
+    DebugUtility::debugInPopUpWindow(array(
         '================'              => '================',
         'conf'                          => $this->conf,
         'hasBreakpoints'                => $this->hasBreakpoints(),
@@ -130,7 +134,7 @@ if ($this->hasDebug()) {
                 $imageHtml = $this->responsiveImage();
 
 if ($this->hasDebug()) {
-    t3lib_utility_Debug::debugInPopUpWindow(array(
+    DebugUtility::debugInPopUpWindow(array(
         'id'                => $this->id(),
         'defaultImage'      => $this->defaultImage(),
         'defaultWidth'      => $this->defaultWidth(),
@@ -153,7 +157,7 @@ if ($this->hasDebug()) {
             }
 
 if ($this->hasDebug()) {
-    t3lib_utility_Debug::debugInPopUpWindow(array(
+    DebugUtility::debugInPopUpWindow(array(
         'imageHtml'         => $imageHtml,
         '================'  => '================',
     ));
@@ -415,7 +419,7 @@ if ($this->hasDebug()) {
                         // The default settings are overridden by individual breakpoint TypoScript configurations
                         if ($this->hasBreakpointConfiguration($breakpoint)) {
                             $impliedConfigurations[$breakpoint] =
-                                    Compatibility::arrayMergeRecursiveOverrule(
+                                    ArrayUtility::arrayMergeRecursiveOverrule(
                                         $impliedConfigurations[$breakpoint],
                                         $this->breakpointConfiguration($breakpoint)
                                     );
@@ -598,7 +602,7 @@ if ($this->hasDebug()) {
 
                     if (isset($this->conf['breakpoints.'][$breakpoint . '.'])) {
                         $breakpointConfigurations[$breakpoint]['file.'] =
-                            Compatibility::arrayMergeRecursiveOverrule(
+                            ArrayUtility::arrayMergeRecursiveOverrule(
                                 (array) $breakpointConfigurations[$breakpoint]['file.'],
                                 (array) $this->conf['breakpoints.'][$breakpoint . '.']['file.']
                             );
@@ -685,7 +689,7 @@ if ($this->hasDebug()) {
                 } else {
                     $breakpoints = $this->conf['breakpoints'];
                 }
-                $breakpoints = t3lib_div::trimExplode(',', $breakpoints, true);
+                $breakpoints = GeneralUtility::trimExplode(',', $breakpoints, true);
 
                 // Converts something like 610:400 to 610
                 $breakpoints = array_filter(array_map('intval', $breakpoints));
@@ -735,7 +739,7 @@ if ($this->hasDebug()) {
     private function layoutContent()
     {
         if (!isset($this->layoutContent[$this->layout()])) {
-            $this->layoutContent[$this->layout()] = t3lib_div::getURL($this->layout());
+            $this->layoutContent[$this->layout()] = GeneralUtility::getURL($this->layout());
         }
 
         return $this->layoutContent[$this->layout()];
@@ -744,14 +748,14 @@ if ($this->hasDebug()) {
     /**
      * Gets the responsive image layout
      *
-     * @return array
+     * @return string
      */
     private function layout()
     {
         if (!isset($this->registry[$this->id]['layout'])) {
-            $this->registry[$this->id]['layout'] = t3lib_div::getFileAbsFileName(self::DEFAULT_LAYOUT);
+            $this->registry[$this->id]['layout'] = GeneralUtility::getFileAbsFileName(self::DEFAULT_LAYOUT);
             if (isset($this->conf['breakpoints.']['layout'])) {
-                $layout = t3lib_div::getFileAbsFileName($this->conf['breakpoints.']['layout']);
+                $layout = GeneralUtility::getFileAbsFileName($this->conf['breakpoints.']['layout']);
                 if (is_readable($layout)) {
                     $this->registry[$this->id]['layout'] = $layout;
                 }
@@ -782,8 +786,4 @@ if ($this->hasDebug()) {
 
         return $this->registry[$this->id]['markers'];
     }
-}
-
-if (defined('TYPO3_MODE') && isset($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['EXT:rtp_imgquery/Classes/Xclass/class.ux_tslib_content_image.php'])) {
-    include_once($GLOBALS['TYPO3_CONF_VARS'][TYPO3_MODE]['XCLASS']['EXT:rtp_imgquery/Classes/Xclass/class.ux_tslib_content_image.php']);
 }

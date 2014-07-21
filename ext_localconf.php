@@ -11,7 +11,7 @@ if (!defined ('TYPO3_MODE')) {
  */
 if(version_compare(TYPO3_version, '5.0.0', '<')) {
     $GLOBALS['TYPO3_CONF_VARS']['FE']['XCLASS']['tslib/content/class.tslib_content_image.php']
-        = \t3lib_extMgm::extPath('rtp_imgquery') . 'Classes/Xclass/class.ux_tslib_content_image.php';
+        = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('rtp_imgquery') . 'Classes/Xclass/class.ux_tslib_content_image.php';
 
 } else {
     // new XCLASS mapping that is used by TYPO3 6.0+

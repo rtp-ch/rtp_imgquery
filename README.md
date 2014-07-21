@@ -108,6 +108,12 @@ styles.content.breakpoints.style =
         quality = 60
     }
 
+###Known issues
+
+This extension does not work if xhtml_cleaning is enabled!
+
+	$GLOBALS['TSFE']->config['config']['xhtml_cleaning'] = 'none';
+
 ##Recommended Reading
 * [Responsive IMGs — Part 1, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs/)
 * [Responsive IMGs Part 2 — In-depth Look at Techniques, by Jason Grigsby](http://www.cloudfour.com/responsive-imgs-part-2/)

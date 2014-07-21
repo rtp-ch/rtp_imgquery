@@ -23,7 +23,6 @@ use \RTP\RtpImgquery\Utility\Html;
  */
 class Images
 {
-
     /**
      * @var
      */

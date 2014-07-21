@@ -59,12 +59,12 @@ class PixelRatios
     private $configuration;
 
     /**
-     * @var
+     * @var array
      */
     private $pixelRatios;
 
     /**
-     * @param $configuration
+     * @param array $configuration
      */
     public function __construct($configuration)
     {
@@ -73,7 +73,7 @@ class PixelRatios
     }
 
     /**
-     * @return mixed
+     * @return array
      */
     public function get()
     {

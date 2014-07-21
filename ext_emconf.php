@@ -10,7 +10,7 @@
 # writing. "version" and "dependencies" must not be touched!
 ########################################################################
 
-$pkg = file_get_contents(t3lib_div::getFileAbsFileName('EXT:rtp_imgquery/package.json'));
+$pkg = file_get_contents(\TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('typo3conf/ext/rtp_imgquery/package.json'));
 $extConf = json_decode($pkg);
 
 $EM_CONF[$_EXTKEY] = array(

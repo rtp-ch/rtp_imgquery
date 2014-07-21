@@ -1,8 +1,8 @@
 <?php
 namespace RTP\RtpImgquery\Responsive;
 
-use \RTP\RtpImgquery\Service\Compatibility;
 use RTP\RtpImgquery\Utility\TypoScript;
+use TYPO3\CMS\Extbase\Utility\ArrayUtility;
 
 /* ============================================================================
  *
@@ -86,7 +86,7 @@ class Configuration
 
         // Merges in any specific configurations for the current breakpoint (e.g. breakpoints.500.x)
         if (isset($this->configuration['breakpoints.'][$breakpoint . '.']['width'])) {
-            $configuration['file.'] = Compatibility::arrayMergeRecursiveOverrule(
+            $configuration['file.'] = ArrayUtility::arrayMergeRecursiveOverrule(
                 (array) $configuration,
                 (array) $this->configuration['breakpoints.'][$breakpoint . '.']
             );

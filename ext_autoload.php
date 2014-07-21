@@ -1,10 +1,6 @@
 <?php
 
-// loads compatibility functions
-require_once __DIR__ . '/Classes/Service/Compatibility.php';
-
-
-$extensionPath = \RTP\RtpImgquery\Service\Compatibility::extPath('rtp_imgquery');
+$extensionPath = \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('rtp_imgquery');
 $extensionClassesPath = $extensionPath . 'Classes/';
 
 return array(
@@ -18,7 +14,6 @@ return array(
     'tx_rtpimgquery_responsive_images' => $extensionClassesPath . 'Responsive/Images.php',
     'tx_rtpimgquery_responsive_strategy' => $extensionClassesPath . 'Responsive/Strategy.php',
     'tx_rtpimgquery_responsive_style' => $extensionClassesPath . 'Responsive/Style.php',
-    'tx_rtpimgquery_service_compatibility' => $extensionClassesPath . 'Service/Compatibility.php',
     'tx_rtpimgquery_utility_collection' => $extensionClassesPath . 'Utility/Collection.php',
     'tx_rtpimgquery_utility_html' => $extensionClassesPath . 'Utility/Html.php',
     'tx_rtpimgquery_utility_typoscript' => $extensionClassesPath . 'Utility/TypoScript.php',

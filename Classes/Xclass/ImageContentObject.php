@@ -1,7 +1,8 @@
 <?php
 namespace RTP\RtpImgquery\Xclass;
 
-use \RTP\RtpImgquery\Service\Compatibility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 
 /* ============================================================================
  *
@@ -60,7 +61,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
     private $conf;
 
     /**
-     * @var \TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer
+     * @var ContentObjectRenderer
      */
     public $cObj;
 
@@ -77,7 +78,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
     /**
      * Rendering the cObject, IMAGE
      *
-     * @param array TypoScript properties
+     * @param array $conf TypoScript properties
      * @return string
      */
     public function render($conf = array())
@@ -115,7 +116,7 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
             }
 
             // Gets an instance of the img query class
-            $this->imgQuery = Compatibility::makeInstance(
+            $this->imgQuery = GeneralUtility::makeInstance(
                 '\RTP\RtpImgquery\ImgQuery',
                 $conf,
                 $this->defaultImage,
@@ -148,6 +149,8 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
                 $imageHtml = $this->cObj->stdWrap($imageHtml, $conf['stdWrap.']);
             }
 
+            // Disable XHTML cleaning - if not disabled the inline JS will be escaped
+            $GLOBALS['TSFE']->config['config']['xhtml_cleaning'] = 'none';
             return $imageHtml;
         }
     }

@@ -36,27 +36,27 @@ class Breakpoints
     private $defaultWidth;
 
     /**
-     * @var
+     * @var int
      */
     private $defaultBreakpoint;
 
     /**
-     * @var
+     * @var string
      */
     private $configuration;
 
     /**
-     * @param $conf
-     * @param $defaultWidth int
-     * @param $defaultBreakpoint int
-     * @param $configuration string
+     * @param array  $conf
+     * @param int    $defaultWidth
+     * @param int    $defaultBreakpoint
+     * @param string $configuration
      */
     public function __construct($conf, $defaultWidth, $defaultBreakpoint, $configuration)
     {
-        $this->conf = $conf;
-        $this->defaultWidth = $defaultWidth;
+        $this->conf              = $conf;
+        $this->defaultWidth      = $defaultWidth;
         $this->defaultBreakpoint = $defaultBreakpoint;
-        $this->configuration = $configuration;
+        $this->configuration     = $configuration;
         $this->set();
     }
 

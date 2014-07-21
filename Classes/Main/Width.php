@@ -1,8 +1,8 @@
 <?php
 namespace RTP\RtpImgquery\Main;
 
-use \RTP\RtpImgquery\Service\Compatibility;
 use \RTP\RtpImgquery\Utility\Html;
+use TYPO3\CMS\Frontend\Controller\TypoScriptFrontendController;
 
 /* ============================================================================
  *
@@ -32,18 +32,18 @@ class Width
     private $conf;
 
     /**
-     * @var
+     * @var string
      */
     private $image;
 
     /**
-     * @var
+     * @var string|int
      */
     private $width;
 
     /**
-     * @param $conf
-     * @param $image \RTP\RtpImgquery\Main\Image
+     * @param array  $conf
+     * @param string $image
      */
     public function __construct($conf, $image)
     {
@@ -87,10 +87,13 @@ class Width
      */
     public function getFromConfiguration()
     {
+        /* @var TypoScriptFrontendController $TSFE */
+        global $TSFE;
+
         $width = false;
 
         if (isset($this->conf['file.']['width'])) {
-            $width = Compatibility::stdWrap($this->conf['file.']['width'], $this->conf['file.']['width.']);
+            $width = $TSFE->cObj->stdWrap($this->conf['file.']['width'], $this->conf['file.']['width.']);
         }
 
         return $width;

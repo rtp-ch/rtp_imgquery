@@ -1,8 +1,8 @@
 <?php
 namespace RTP\RtpImgquery\ViewHelpers;
 
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use \TYPO3\CMS\Fluid\ViewHelpers\ImageViewHelper;
-use RTP\RtpImgquery\Service\Compatibility;
 
 /* ============================================================================
  *
@@ -111,7 +111,7 @@ class Tx_RtpImgquery_ViewHelpers_ImageViewHelper extends ImageViewHelper
         );
 
         // Gets an instance of the img query class
-        $this->imgQuery = Compatibility::makeInstance(
+        $this->imgQuery = GeneralUtility::makeInstance(
             '\RTP\RtpImgquery\ImgQuery',
             $conf,
             $defaultImage,

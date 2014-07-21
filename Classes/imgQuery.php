@@ -1,7 +1,7 @@
 <?php
 namespace RTP\RtpImgquery;
 
-use \RTP\RtpImgquery\Service\Compatibility as Compatibility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /* ============================================================================
  *
@@ -131,25 +131,25 @@ class ImgQuery
         $this->defaultImage = $defaultImage;
         $this->conf = $conf;
 
-        $this->defaultWidth = Compatibility::makeInstance(
+        $this->defaultWidth = GeneralUtility::makeInstance(
             '\RTP\RtpImgquery\Main\Width',
             $this->conf,
             $this->defaultImage
         );
 
-        $this->defaultHeight = Compatibility::makeInstance(
+        $this->defaultHeight = GeneralUtility::makeInstance(
             '\RTP\RtpImgquery\Main\Height',
             $this->conf,
             $this->defaultImage
         );
 
-        $this->defaultBreakpoint = Compatibility::makeInstance(
+        $this->defaultBreakpoint = GeneralUtility::makeInstance(
             '\RTP\RtpImgquery\Main\Breakpoint',
             $this->defaultWidth->get(),
             $defaultBreakpoint
         );
 
-        $this->breakpoints = Compatibility::makeInstance(
+        $this->breakpoints = GeneralUtility::makeInstance(
             '\RTP\RtpImgquery\Client\Breakpoints',
             $this->conf,
             $this->defaultWidth->get(),
@@ -157,7 +157,7 @@ class ImgQuery
             $breakpoints
         );
 
-        $this->pixelRatios = Compatibility::makeInstance(
+        $this->pixelRatios = GeneralUtility::makeInstance(
             '\RTP\RtpImgquery\Client\PixelRatios',
             $pixelRatios
         );
@@ -175,7 +175,7 @@ class ImgQuery
 
             // The configuration class handles respective configurations (i.e. image dimensions)
             // for different breakpoints and pixel ratios
-            $this->configuration = Compatibility::makeInstance(
+            $this->configuration = GeneralUtility::makeInstance(
                 '\RTP\RtpImgquery\Responsive\Configuration',
                 $this->conf,
                 $this->defaultWidth->get(),
@@ -185,13 +185,13 @@ class ImgQuery
             );
 
             // The style class handles inline fluid style for images
-            $this->style = Compatibility::makeInstance(
+            $this->style = GeneralUtility::makeInstance(
                 '\RTP\RtpImgquery\Responsive\Style',
                 $this->conf
             );
 
             // The images class handles generating various images for the defined breakpoints and pixel ratios
-            $this->images = Compatibility::makeInstance(
+            $this->images = GeneralUtility::makeInstance(
                 '\RTP\RtpImgquery\Responsive\Images',
                 $this->breakpoints,
                 $this->pixelRatios,
@@ -203,7 +203,7 @@ class ImgQuery
             $this->images->generate($imageRenderer);
 
             // The strategy class implements the HTML/JavaScript which is inserted in place of the original image HTML
-            $this->strategy = Compatibility::makeInstance(
+            $this->strategy = GeneralUtility::makeInstance(
                 '\RTP\RtpImgquery\Responsive\Strategy',
                 $this->conf
             );

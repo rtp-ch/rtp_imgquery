@@ -1,7 +1,7 @@
 <?php
 namespace RTP\RtpImgquery\Responsive;
 
-use \RTP\RtpImgquery\Service\Compatibility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /* ============================================================================
  *
@@ -81,18 +81,18 @@ class Strategy
     {
         if (isset($this->conf['breakpoints.']['layout'])) {
             // Uses "layout" for backwards compatibility
-            $strategy = Compatibility::getFileAbsFileName($this->conf['breakpoints.']['layout']);
+            $strategy = GeneralUtility::getFileAbsFileName($this->conf['breakpoints.']['layout']);
 
         } elseif (isset($this->conf['breakpoints.']['strategy'])) {
             // "strategy" should define a file with an HTML/JavaScritp snippet
-            $strategy = Compatibility::getFileAbsFileName($this->conf['breakpoints.']['strategy']);
+            $strategy = GeneralUtility::getFileAbsFileName($this->conf['breakpoints.']['strategy']);
 
         } else {
             // Implements the default strategy if no other strategy was defined
-            $strategy = Compatibility::getFileAbsFileName(self::DEFAULT_STRATEGY);
+            $strategy = GeneralUtility::getFileAbsFileName(self::DEFAULT_STRATEGY);
         }
 
-        $this->strategy = trim(Compatibility::getURL($strategy));
+        $this->strategy = trim(GeneralUtility::getURL($strategy));
 
         if (!$this->strategy) {
             $msg = 'Unable to read contents of responsive images strategy "' . $strategy . '"';
