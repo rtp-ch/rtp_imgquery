@@ -149,8 +149,6 @@ class ImageContentObject extends \TYPO3\CMS\Frontend\ContentObject\ImageContentO
                 $imageHtml = $this->cObj->stdWrap($imageHtml, $conf['stdWrap.']);
             }
 
-            // Disable XHTML cleaning - if not disabled the inline JS will be escaped
-            $GLOBALS['TSFE']->config['config']['xhtml_cleaning'] = 'none';
             return $imageHtml;
         }
     }
