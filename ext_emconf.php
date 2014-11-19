@@ -10,15 +10,12 @@
 # writing. "version" and "dependencies" must not be touched!
 ########################################################################
 
-$pkg = file_get_contents(\TYPO3\CMS\Core\Utility\GeneralUtility::getFileAbsFileName('typo3conf/ext/rtp_imgquery/package.json'));
-$extConf = json_decode($pkg);
-
-$EM_CONF[$_EXTKEY] = array(
-    'title' => $extConf->title,
-    'description' => $extConf->description,
+$EM_CONF['rtp_imgquery'] = array(
+    'title' => 'rtp_imgquery',
+    'description' => 'TYPO3 extension that adds responsive and fluid image techniques to the TypoScript IMAGE object, the default image content elements (\"Text & Images\", \"Images Only\") as well as the standard Smarty and Fluid image view helpers',
     'category' => 'fe',
-    'author' => $extConf->author,
-    'author_email' => 'stu@rtp.ch',
+    'author' => 'rtp',
+    'author_email' => 'info@rtp.ch',
     'shy' => '',
     'dependencies' => '',
     'conflicts' => '',
@@ -32,10 +29,11 @@ $EM_CONF[$_EXTKEY] = array(
     'clearCacheOnLoad' => 0,
     'lockType' => '',
     'author_company' => '',
-    'version' => $extConf->version,
+    'version' => '2.1.0',
     'constraints' => array(
         'depends' => array(
-            'typo3' => '6.0.0-'
+            'php' => '5.4.0-0.0.0',
+            'typo3' => '6.2.0-6.2.99',
         ),
         'conflicts' => array(
             // Requires smarty version 1.11.0 for the smarty plugin
