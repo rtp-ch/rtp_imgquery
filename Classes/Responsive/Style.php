@@ -96,6 +96,11 @@ class Style
                 }
             }
         }
+
+        // Apply default style
+        if ($this->style === false) {
+            $this->style = self::DEFAULT_STYLE;
+        }
     }
 
     private function setFluidStyle()
