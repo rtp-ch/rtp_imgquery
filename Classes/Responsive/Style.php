@@ -98,7 +98,7 @@ class Style
         }
 
         // Apply default style
-        if ($this->style === false) {
+        if ($this->style = false && isset($style)) {
             $this->style = self::DEFAULT_STYLE;
         }
     }
